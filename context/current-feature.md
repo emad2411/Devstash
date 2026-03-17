@@ -4,7 +4,7 @@ Dashboard UI with Mock Data
 
 ## Status
 
-In Progress
+Completed
 
 ## Tasks
 
@@ -12,8 +12,11 @@ In Progress
 - [x] Create navbar component with sidebar toggle, search, theme toggle, notifications, action buttons
 - [x] Create sidebar component with navigation, collections, user profile
 - [x] Create dashboard layout integrating navbar and sidebar
-- [ ] Create item card components
-- [ ] Create item list views
+- [x] Create Welcome Header with gradient text
+- [x] Create Pinned Collections grid with collection cards
+- [x] Create Recent Items section with grid/list toggle
+- [x] Create item card components with type colors
+- [x] Create collection card components with icon previews
 
 ## Goals
 
@@ -36,3 +39,5 @@ In Progress
 <!-- Keep this updated. Earliest to latest -->
 
 - Project setup and boilerplate cleanup
+- Dashboard Phase 3: Welcome header, Pinned Collections grid, Recent Items with grid/list toggle
+- Refactored dashboard components to use shadcn/ui Button component
