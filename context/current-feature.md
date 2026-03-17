@@ -10,8 +10,8 @@ In Progress
 
 - [x] Install shadcn/ui components (button, input, dropdown-menu)
 - [x] Create navbar component with sidebar toggle, search, theme toggle, notifications, action buttons
-- [ ] Create sidebar component
-- [ ] Create dashboard layout
+- [x] Create sidebar component with navigation, collections, user profile
+- [x] Create dashboard layout integrating navbar and sidebar
 - [ ] Create item card components
 - [ ] Create item list views
 
