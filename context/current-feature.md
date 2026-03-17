@@ -6,6 +6,15 @@ Dashboard UI with Mock Data
 
 In Progress
 
+## Tasks
+
+- [x] Install shadcn/ui components (button, input, dropdown-menu)
+- [x] Create navbar component with sidebar toggle, search, theme toggle, notifications, action buttons
+- [ ] Create sidebar component
+- [ ] Create dashboard layout
+- [ ] Create item card components
+- [ ] Create item list views
+
 ## Goals
 
 - Create dashboard layout with sidebar navigation
