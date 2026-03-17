@@ -1,20 +1,26 @@
 # Current Feature
 
-<!-- Feature Name -->
+Dashboard UI with Mock Data
 
 ## Status
 
-<!-- Not Started|In Progress|Completed -->
-
-Not Started
+In Progress
 
 ## Goals
 
-<!-- Goals & requirements -->
+- Create dashboard layout with sidebar navigation
+- Build item card components for all types (snippet, prompt, command, note, link, file, image)
+- Create item list views filtered by type
+- Implement search UI (filtering mock data)
+- Add favorites and pinned sections
+- Use mock data from lib/data.ts for all content
 
 ## Notes
 
-<!-- Any extra notes -->
+- Building UI first before backend setup
+- Using mock data to define data requirements
+- Will replace mock data with real API calls later
+- Focus on component structure and user experience
 
 ## History
 

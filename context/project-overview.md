@@ -427,7 +427,7 @@ model ItemTag {
 ## 🚀 Implementation Roadmap
 
 ### Phase 1: Foundation (Week 1-2)
-- [ ] Project setup (Next.js 16, TypeScript, Tailwind v4)
+- [x] Project setup (Next.js 16, TypeScript, Tailwind v4)
 - [ ] Database setup (Neon + Prisma)
 - [ ] Authentication (Next-Auth v5)
 - [ ] Basic layout (Sidebar + Main)
