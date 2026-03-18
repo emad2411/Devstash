@@ -9,7 +9,6 @@ const envConfig = config({ path: envPath })
 expand(envConfig)
 
 export default defineConfig({
-  earlyAccess: true,
   schema: './prisma/schema.prisma',
   datasource: {
     url: process.env.DATABASE_URL,

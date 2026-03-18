@@ -1,38 +1,41 @@
 # Current Feature
 
-Prisma ORM v7 Setup with Database Schema and Seeding
+Seed Database with Full Development Data
 
 ## Status
 
-Completed
+Complete
 
 ## Tasks
 
-- [x] Create `prisma/schema.prisma` with all models (User, Account, Session, VerificationToken, Item, ItemType, Collection, ItemCollection, Tag, ItemTag)
-- [x] Create `src/lib/prisma.ts` singleton client configuration
-- [x] Set up environment variables for DATABASE_URL
-- [x] Create `prisma/seed.ts` with 7 system ItemTypes
-- [x] Add seed script to package.json
-- [x] Create initial migration with `prisma migrate dev --name init`
-- [x] Run `prisma db seed` to populate system types
-- [x] Verify migration status with `prisma migrate status`
+- [x] Install `bcryptjs` for password hashing
+- [x] Seed demo user (demo@devstash.io, password: 12345678, isPro: false)
+- [x] Seed 7 system ItemTypes (already exists, keep as-is)
+- [x] Seed 15 tags from lib/data.ts (javascript, react, typescript, etc.)
+- [x] Seed 5 collections per spec:
+  - [x] React Patterns (3 snippets)
+  - [x] AI Workflows (3 prompts)
+  - [x] DevOps (1 snippet, 1 command, 2 links)
+  - [x] Terminal Commands (4 commands)
+  - [x] Design Resources (4 links)
+- [x] Link items to relevant tags (ItemTag)
+- [x] Run `prisma db seed` and verify
+- [x] Update `context/current-feature.md`
 
 ## Goals
 
-- Set up Prisma ORM v7 with Neon PostgreSQL
-- Implement complete database schema matching project ERD
-- Configure PrismaClient singleton with hot reload support
-- Seed system ItemTypes (snippet, prompt, command, note, file, image, link)
-- Follow migration-based workflow (no db push)
+- Populate database with realistic demo data for development
+- Reuse content from `lib/data.ts` where applicable
+- Follow the spec in `context/features/seed-spec.md`
+- Include tag-to-item relationships
 
 ## Notes
 
-- Using Prisma v7 latest
-- Database: Neon PostgreSQL
-- All IDs use CUID format
-- System types have isSystem=true and userId=null
-- Relations use onDelete: Cascade
-- Text fields use @db.Text for long content
+- Password hashed with bcryptjs (12 rounds)
+- Reuse code content from `lib/data.ts` snippets, prompts, commands, links
+- Adapt item content to match spec collections
+- User emailVerified set to current date
+- Tags are created standalone, then linked to items via ItemTag
 
 ## History
 
@@ -42,3 +45,4 @@ Completed
 - Dashboard Phase 3: Welcome header, Pinned Collections grid, Recent Items with grid/list toggle
 - Refactored dashboard components to use shadcn/ui Button component
 - Prisma ORM v7 Setup: Database schema, migrations, seeding with system ItemTypes
+- Seed Database: Demo user, 15 tags, 5 collections with 15 items and tag relationships

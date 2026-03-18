@@ -6,22 +6,20 @@ datasource db {
   provider = "postgresql"
 }
 
-// Next-Auth Models
 model Account {
   id                String  @id @default(cuid())
   userId            String
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -35,26 +33,22 @@ model Session {
 }
 
 model User {
-  id                    String       @id @default(cuid())
-  email                 String       @unique
-  emailVerified         DateTime?
-  name                  String?
-  image                 String?
-  password              String?      @db.Text
-  accounts              Account[]
-  sessions              Session[]
-
-  // DevStash specific
-  isPro                 Boolean      @default(false)
-  stripeCustomerId      String?      @unique
-  stripeSubscriptionId  String?      @unique
-
-  items                 Item[]
-  collections           Collection[]
-  itemTypes             ItemType[]
-
-  createdAt             DateTime     @default(now())
-  updatedAt             DateTime     @updatedAt
+  id                   String       @id @default(cuid())
+  email                String       @unique
+  emailVerified        DateTime?
+  name                 String?
+  image                String?
+  isPro                Boolean      @default(false)
+  stripeCustomerId     String?      @unique
+  stripeSubscriptionId String?      @unique
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+  password             String?
+  accounts             Account[]
+  collections          Collection[]
+  items                Item[]
+  itemTypes            ItemType[]
+  sessions             Session[]
 }
 
 model VerificationToken {
@@ -65,43 +59,27 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-// DevStash Models
-enum ContentType {
-  TEXT
-  FILE
-}
-
 model Item {
-  id            String           @id @default(cuid())
-  title         String
-  contentType   ContentType      @default(TEXT)
-  content       String?          @db.Text
-
-  // File fields
-  fileUrl       String?
-  fileName      String?
-  fileSize      Int?
-
-  // Link specific
-  url           String?
-
-  description   String?          @db.Text
-  isFavorite    Boolean          @default(false)
-  isPinned      Boolean          @default(false)
-  language      String?          // For syntax highlighting
-
-  // Relations
-  userId        String
-  user          User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  itemTypeId    String
-  itemType      ItemType         @relation(fields: [itemTypeId], references: [id])
-
-  collections   ItemCollection[]
-  tags          ItemTag[]
-
-  createdAt     DateTime         @default(now())
-  updatedAt     DateTime         @updatedAt
+  id          String           @id @default(cuid())
+  title       String
+  contentType ContentType      @default(TEXT)
+  content     String?
+  fileUrl     String?
+  fileName    String?
+  fileSize    Int?
+  url         String?
+  description String?
+  isFavorite  Boolean          @default(false)
+  isPinned    Boolean          @default(false)
+  language    String?
+  userId      String
+  itemTypeId  String
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  itemType    ItemType         @relation(fields: [itemTypeId], references: [id])
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  collections ItemCollection[]
+  tags        ItemTag[]
 
   @@index([userId])
   @@index([itemTypeId])
@@ -110,50 +88,42 @@ model Item {
 }
 
 model ItemType {
-  id          String    @id @default(cuid())
-  name        String    // snippet, prompt, note, command, file, image, link
-  icon        String    // Lucide icon name
-  color       String    // Hex color code
-  isSystem    Boolean   @default(false)
-
-  userId      String?   // Null for system types
-  user        User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  items       Item[]
+  id          String       @id @default(cuid())
+  name        String
+  icon        String
+  color       String
+  isSystem    Boolean      @default(false)
+  userId      String?
   collections Collection[] @relation("DefaultType")
+  items       Item[]
+  user        User?        @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([name, userId])
 }
 
 model Collection {
-  id              String           @id @default(cuid())
-  name            String
-  description     String?          @db.Text
-  isFavorite      Boolean          @default(false)
-
-  defaultTypeId   String?
-  defaultType     ItemType?        @relation("DefaultType", fields: [defaultTypeId], references: [id])
-
-  userId          String
-  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  items           ItemCollection[]
-
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
+  id            String           @id @default(cuid())
+  name          String
+  description   String?
+  isFavorite    Boolean          @default(false)
+  defaultTypeId String?
+  userId        String
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  defaultType   ItemType?        @relation("DefaultType", fields: [defaultTypeId], references: [id])
+  user          User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items         ItemCollection[]
 
   @@index([userId])
   @@index([isFavorite])
 }
 
 model ItemCollection {
-  itemId        String
-  item          Item       @relation(fields: [itemId], references: [id], onDelete: Cascade)
-
-  collectionId  String
-  collection    Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
-
-  addedAt       DateTime   @default(now())
+  itemId       String
+  collectionId String
+  addedAt      DateTime   @default(now())
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  item         Item       @relation(fields: [itemId], references: [id], onDelete: Cascade)
 
   @@id([itemId, collectionId])
   @@index([collectionId])
@@ -167,9 +137,14 @@ model Tag {
 
 model ItemTag {
   itemId String
-  item   Item   @relation(fields: [itemId], references: [id], onDelete: Cascade)
   tagId  String
+  item   Item   @relation(fields: [itemId], references: [id], onDelete: Cascade)
   tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
 
   @@id([itemId, tagId])
+}
+
+enum ContentType {
+  TEXT
+  FILE
 }
