@@ -1,6 +1,6 @@
 # Current Feature
 
-Dashboard UI with Mock Data
+Prisma ORM v7 Setup with Database Schema and Seeding
 
 ## Status
 
@@ -8,31 +8,31 @@ Completed
 
 ## Tasks
 
-- [x] Install shadcn/ui components (button, input, dropdown-menu)
-- [x] Create navbar component with sidebar toggle, search, theme toggle, notifications, action buttons
-- [x] Create sidebar component with navigation, collections, user profile
-- [x] Create dashboard layout integrating navbar and sidebar
-- [x] Create Welcome Header with gradient text
-- [x] Create Pinned Collections grid with collection cards
-- [x] Create Recent Items section with grid/list toggle
-- [x] Create item card components with type colors
-- [x] Create collection card components with icon previews
+- [x] Create `prisma/schema.prisma` with all models (User, Account, Session, VerificationToken, Item, ItemType, Collection, ItemCollection, Tag, ItemTag)
+- [x] Create `src/lib/prisma.ts` singleton client configuration
+- [x] Set up environment variables for DATABASE_URL
+- [x] Create `prisma/seed.ts` with 7 system ItemTypes
+- [x] Add seed script to package.json
+- [x] Create initial migration with `prisma migrate dev --name init`
+- [x] Run `prisma db seed` to populate system types
+- [x] Verify migration status with `prisma migrate status`
 
 ## Goals
 
-- Create dashboard layout with sidebar navigation
-- Build item card components for all types (snippet, prompt, command, note, link, file, image)
-- Create item list views filtered by type
-- Implement search UI (filtering mock data)
-- Add favorites and pinned sections
-- Use mock data from lib/data.ts for all content
+- Set up Prisma ORM v7 with Neon PostgreSQL
+- Implement complete database schema matching project ERD
+- Configure PrismaClient singleton with hot reload support
+- Seed system ItemTypes (snippet, prompt, command, note, file, image, link)
+- Follow migration-based workflow (no db push)
 
 ## Notes
 
-- Building UI first before backend setup
-- Using mock data to define data requirements
-- Will replace mock data with real API calls later
-- Focus on component structure and user experience
+- Using Prisma v7 latest
+- Database: Neon PostgreSQL
+- All IDs use CUID format
+- System types have isSystem=true and userId=null
+- Relations use onDelete: Cascade
+- Text fields use @db.Text for long content
 
 ## History
 
@@ -41,3 +41,4 @@ Completed
 - Project setup and boilerplate cleanup
 - Dashboard Phase 3: Welcome header, Pinned Collections grid, Recent Items with grid/list toggle
 - Refactored dashboard components to use shadcn/ui Button component
+- Prisma ORM v7 Setup: Database schema, migrations, seeding with system ItemTypes
