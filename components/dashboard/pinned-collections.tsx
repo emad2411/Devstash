@@ -1,22 +1,16 @@
 'use client';
 
-import { Collection, ItemType } from '@/lib/data';
-import { CollectionCard } from './collection-card';
+import { DashboardCollection } from '@/types/dashboard';
 import { Button } from '@/components/ui/button';
 import { ChevronRight } from 'lucide-react';
 
+import { CollectionCard } from './collection-card';
+
 interface PinnedCollectionsProps {
-  collections: Collection[];
-  itemTypes: ItemType[];
+  collections: DashboardCollection[];
 }
 
-export function PinnedCollections({ collections, itemTypes }: PinnedCollectionsProps) {
-  // Mock item counts for each collection
-  const getItemCount = (index: number) => {
-    const counts = [12, 8, 24, 15, 6];
-    return counts[index % counts.length];
-  };
-
+export function PinnedCollections({ collections }: PinnedCollectionsProps) {
   return (
     <section className="mb-10">
       {/* Header */}
@@ -30,12 +24,10 @@ export function PinnedCollections({ collections, itemTypes }: PinnedCollectionsP
 
       {/* Grid */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {collections.slice(0, 6).map((collection, index) => (
+        {collections.slice(0, 6).map((collection) => (
           <CollectionCard
             key={collection.id}
             collection={collection}
-            itemTypes={itemTypes}
-            itemCount={getItemCount(index)}
           />
         ))}
       </div>

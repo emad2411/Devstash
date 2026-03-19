@@ -1,12 +1,11 @@
 'use client';
 
-import { mockStats } from '@/lib/data';
-
 interface WelcomeHeaderProps {
   userName?: string;
+  totalItems: number;
 }
 
-export function WelcomeHeader({ userName = 'John' }: WelcomeHeaderProps) {
+export function WelcomeHeader({ userName = 'Developer', totalItems }: WelcomeHeaderProps) {
   const currentHour = new Date().getHours();
 
   let greeting = 'Good morning';
@@ -24,7 +23,7 @@ export function WelcomeHeader({ userName = 'John' }: WelcomeHeaderProps) {
         </span>
       </h1>
       <p className="mt-2 text-muted-foreground">
-        You have {mockStats.totalItems} items stored in your stash.
+        You have {totalItems} items stored in your stash.
       </p>
     </div>
   );

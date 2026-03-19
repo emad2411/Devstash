@@ -4,3 +4,19 @@ export interface SidebarCollection {
   name: string;
   count: number;
 }
+
+/** Item type navigation entry for sidebar */
+export interface SidebarNavItem {
+  id: string;
+  name: string;
+  icon: string;   // Lucide icon name as string
+  color: string;
+  itemCount: number;
+}
+
+/** Dashboard statistics */
+export interface DashboardStats {
+  totalItems: number;
+  favorites: number;
+  pinned: number;
+}

@@ -127,8 +127,6 @@ async function main() {
   const snippetType = systemTypes.find((t) => t.name === 'snippet')
   assert(!!snippetType, 'Snippet type exists for item creation')
 
-  const promptType = systemTypes.find((t) => t.name === 'prompt')
-  const commandType = systemTypes.find((t) => t.name === 'command')
   const linkType = systemTypes.find((t) => t.name === 'link')
 
   // ═══════════════════════════════════════════════════

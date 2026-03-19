@@ -4,14 +4,15 @@ import { useState } from 'react';
 
 import { Navbar } from '@/components/layout/navbar';
 import { Sidebar } from '@/components/layout/sidebar';
-import { SidebarCollection } from '@/types/layout';
+import { SidebarCollection, SidebarNavItem } from '@/types/layout';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
   collections: SidebarCollection[];
+  navItems: SidebarNavItem[];
 }
 
-export function DashboardLayout({ children, collections }: DashboardLayoutProps) {
+export function DashboardLayout({ children, collections, navItems }: DashboardLayoutProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [activeItem, setActiveItem] = useState('all');
 
@@ -28,6 +29,7 @@ export function DashboardLayout({ children, collections }: DashboardLayoutProps)
           activeItem={activeItem}
           onItemClick={setActiveItem}
           collections={collections}
+          navItems={navItems}
         />
         <main className="flex-1 overflow-auto bg-muted/30 p-6">
           {children}

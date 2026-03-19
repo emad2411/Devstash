@@ -4,26 +4,26 @@ Database-Driven Dashboard & Sidebar
 
 ## Status
 
-In Progress
+Completed
 
 ## Tasks
 
-- [ ] Install `server-only` package
-- [ ] Create `lib/queries.ts` - Server-only Prisma queries for dashboard data
-- [ ] Create `lib/icon-map.ts` - Centralized Lucide icon resolver
-- [ ] Create `types/dashboard.ts` - Serializable types for dashboard components
-- [ ] Modify `types/layout.ts` - Add `SidebarNavItem` and `DashboardStats` types
-- [ ] Modify `components/layout/dashboard-layout.tsx` - Add `navItems` prop
-- [ ] Modify `components/layout/sidebar.tsx` - Accept `navItems` prop, remove hardcoded array
-- [ ] Modify `app/dashboard/page.tsx` - Replace mock imports with Prisma queries
-- [ ] Modify `components/dashboard/welcome-header.tsx` - Accept `totalItems` prop
-- [ ] Modify `components/dashboard/pinned-collections.tsx` - Use `DashboardCollection`, remove itemTypes prop
-- [ ] Modify `components/dashboard/collection-card.tsx` - Use `DashboardCollection`, use shared `getIcon()`
-- [ ] Modify `components/dashboard/recent-items.tsx` - Use `DashboardItem`, remove itemTypes prop
-- [ ] Modify `components/dashboard/item-card.tsx` - Use `DashboardItem`, real tags, shared `getIcon()`
-- [ ] Run build and verify
-- [ ] Run lint and verify
-- [ ] Update `context/current-feature.md`
+- [x] Install `server-only` package
+- [x] Create `lib/queries.ts` - Server-only Prisma queries for dashboard data
+- [x] Create `lib/icon-map.ts` - Centralized Lucide icon resolver
+- [x] Create `types/dashboard.ts` - Serializable types for dashboard components
+- [x] Modify `types/layout.ts` - Add `SidebarNavItem` and `DashboardStats` types
+- [x] Modify `components/layout/dashboard-layout.tsx` - Add `navItems` prop
+- [x] Modify `components/layout/sidebar.tsx` - Accept `navItems` prop, remove hardcoded array
+- [x] Modify `app/dashboard/page.tsx` - Replace mock imports with Prisma queries
+- [x] Modify `components/dashboard/welcome-header.tsx` - Accept `totalItems` prop
+- [x] Modify `components/dashboard/pinned-collections.tsx` - Use `DashboardCollection`, remove itemTypes prop
+- [x] Modify `components/dashboard/collection-card.tsx` - Use `DashboardCollection`, use shared `getIcon()`
+- [x] Modify `components/dashboard/recent-items.tsx` - Use `DashboardItem`, remove itemTypes prop
+- [x] Modify `components/dashboard/item-card.tsx` - Use `DashboardItem`, real tags, shared `getIcon()`
+- [x] Run build and verify
+- [x] Run lint and verify
+- [x] Update `context/current-feature.md`
 
 ## Goals
 
@@ -50,3 +50,4 @@ In Progress
 - Prisma ORM v7 Setup: Database schema, migrations, seeding with system ItemTypes
 - Seed Database: Demo user, 15 tags, 5 collections with 15 items and tag relationships
 - Dashboard Server Component Refactor: Extracted DashboardLayout, data flows top-down
+- Database-Driven Dashboard: Replaced mock data with Prisma queries, added icon-map.tsx with renderIcon helper, fixed React compiler errors

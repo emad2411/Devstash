@@ -1,20 +1,6 @@
 'use client';
 
-import {
-  ChevronRight,
-  Code2,
-  Command,
-  FileImage,
-  FileText,
-  Folder,
-  Grid3X3,
-  ImageIcon,
-  Link as LinkIcon,
-  Settings,
-  Sparkles,
-  StickyNote,
-  Terminal,
-} from 'lucide-react';
+import { ChevronRight, Folder, Settings } from 'lucide-react';
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -24,8 +10,9 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { renderIcon } from '@/lib/icon-map';
 import { cn } from '@/lib/utils';
-import { SidebarCollection } from '@/types/layout';
+import { SidebarCollection, SidebarNavItem } from '@/types/layout';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -33,20 +20,16 @@ interface SidebarProps {
   activeItem: string;
   onItemClick: (item: string) => void;
   collections: SidebarCollection[];
+  navItems: SidebarNavItem[];
 }
 
-// Navigation items with their colors from project spec
-const navItems = [
-  { id: 'all', label: 'All Items', icon: Grid3X3, color: '#6b7280' },
-  { id: 'snippet', label: 'Snippets', icon: Code2, color: '#3b82f6' },
-  { id: 'prompt', label: 'Prompts', icon: Sparkles, color: '#8b5cf6' },
-  { id: 'command', label: 'Commands', icon: Terminal, color: '#f97316' },
-  { id: 'note', label: 'Notes', icon: StickyNote, color: '#fde047' },
-  { id: 'image', label: 'Images', icon: ImageIcon, color: '#ec4899' },
-  { id: 'file', label: 'Files', icon: FileText, color: '#6b7280' },
-  { id: 'link', label: 'Links', icon: LinkIcon, color: '#10b981' },
-];
 
+interface NavItemData {
+  id: string;
+  label: string;
+  icon: string;
+  color: string;
+}
 
 function NavItem({
   item,
@@ -54,13 +37,11 @@ function NavItem({
   isOpen,
   onClick,
 }: {
-  item: (typeof navItems)[0];
+  item: NavItemData;
   isActive: boolean;
   isOpen: boolean;
   onClick: () => void;
 }) {
-  const Icon = item.icon;
-
   const content = (
     <button
       onClick={onClick}
@@ -76,11 +57,11 @@ function NavItem({
         <span className="absolute left-0 top-1/2 h-6 w-0.5 -translate-y-1/2 rounded-r-full bg-primary" />
       )}
 
-      <Icon
-        className="shrink-0 transition-colors"
-        style={{ color: item.color }}
-        size={20}
-      />
+      {renderIcon(item.icon, {
+        className: 'shrink-0 transition-colors',
+        style: { color: item.color },
+        size: 20,
+      })}
 
       {isOpen && (
         <span className="truncate text-sm font-medium">{item.label}</span>
@@ -142,7 +123,18 @@ export function Sidebar({
   activeItem,
   onItemClick,
   collections,
+  navItems,
 }: SidebarProps) {
+  // "All Items" is prepended as a static entry
+  const allNavItems: NavItemData[] = [
+    { id: 'all', label: 'All Items', icon: 'Grid3X3', color: '#6b7280' },
+    ...navItems.map((item) => ({
+      id: item.id,
+      label: item.name,
+      icon: item.icon,
+      color: item.color,
+    })),
+  ];
   return (
     <TooltipProvider>
       <aside
@@ -154,7 +146,7 @@ export function Sidebar({
         {/* TOP SECTION: Navigation */}
         <div className="flex-1 overflow-y-auto py-4">
           <nav className="flex flex-col gap-1 px-2">
-            {navItems.map((item) => (
+            {allNavItems.map((item) => (
               <NavItem
                 key={item.id}
                 item={item}

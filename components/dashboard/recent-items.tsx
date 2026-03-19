@@ -1,31 +1,24 @@
 'use client';
 
 import { useState } from 'react';
-import { Item, ItemType } from '@/lib/data';
-import { ItemCard } from './item-card';
+import { DashboardItem } from '@/types/dashboard';
 import { Button } from '@/components/ui/button';
 import { LayoutGrid, List } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+import { ItemCard } from './item-card';
+
 interface RecentItemsProps {
-  items: Item[];
-  itemTypes: ItemType[];
+  items: DashboardItem[];
 }
 
 type ViewMode = 'grid' | 'list';
 
-export function RecentItems({ items, itemTypes }: RecentItemsProps) {
+export function RecentItems({ items }: RecentItemsProps) {
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
 
-  // Get item type for an item
-  const getItemType = (item: Item) => {
-    return itemTypes.find(t => t.id === item.itemTypeId);
-  };
-
-  // Sort by updatedAt descending and take first 8
-  const recentItems = [...items]
-    .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
-    .slice(0, 8);
+  // Server already returns sorted items, just take first 8
+  const recentItems = items.slice(0, 8);
 
   return (
     <section>
@@ -71,7 +64,6 @@ export function RecentItems({ items, itemTypes }: RecentItemsProps) {
           <ItemCard
             key={item.id}
             item={item}
-            itemType={getItemType(item)}
           />
         ))}
       </div>
