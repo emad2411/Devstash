@@ -25,12 +25,14 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
+import { SidebarCollection } from '@/types/layout';
 
 interface SidebarProps {
   isOpen: boolean;
   onToggle: () => void;
   activeItem: string;
   onItemClick: (item: string) => void;
+  collections: SidebarCollection[];
 }
 
 // Navigation items with their colors from project spec
@@ -45,14 +47,6 @@ const navItems = [
   { id: 'link', label: 'Links', icon: LinkIcon, color: '#10b981' },
 ];
 
-// Mock collections data
-const collections = [
-  { id: '1', name: 'React Patterns', count: 12 },
-  { id: '2', name: 'Docker Configs', count: 5 },
-  { id: '3', name: 'API Prompts', count: 8 },
-  { id: '4', name: 'Useful Tools', count: 24 },
-  { id: '5', name: 'Design Assets', count: 15 },
-];
 
 function NavItem({
   item,
@@ -112,7 +106,7 @@ function CollectionItem({
   collection,
   isOpen,
 }: {
-  collection: (typeof collections)[0];
+  collection: SidebarCollection;
   isOpen: boolean;
 }) {
   const content = (
@@ -145,9 +139,9 @@ function CollectionItem({
 
 export function Sidebar({
   isOpen,
-  onToggle,
   activeItem,
   onItemClick,
+  collections,
 }: SidebarProps) {
   return (
     <TooltipProvider>

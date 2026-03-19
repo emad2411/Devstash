@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { Item, ItemType } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import {
@@ -39,26 +40,47 @@ const typeLabels: Record<string, string> = {
   link: 'Link',
 };
 
-function getRelativeTime(date: Date): string {
-  const now = new Date();
-  const diff = now.getTime() - new Date(date).getTime();
-  const minutes = Math.floor(diff / 60000);
-  const hours = Math.floor(diff / 3600000);
-  const days = Math.floor(diff / 86400000);
+function useRelativeTime(date: Date): string {
+  const [relativeTime, setRelativeTime] = useState<string>(() => {
+    // Initial static format for server/client consistency
+    return new Date(date).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+    });
+  });
 
-  if (minutes < 60) return `${minutes} minute${minutes !== 1 ? 's' : ''} ago`;
-  if (hours < 24) return `${hours} hour${hours !== 1 ? 's' : ''} ago`;
-  if (days < 7) return `${days} day${days !== 1 ? 's' : ''} ago`;
-  return new Date(date).toLocaleDateString();
+  useEffect(() => {
+    // Calculate relative time on client only
+    const now = new Date();
+    const diff = now.getTime() - new Date(date).getTime();
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+
+    if (minutes < 60) {
+      setRelativeTime(`${minutes} minute${minutes !== 1 ? 's' : ''} ago`);
+    } else if (hours < 24) {
+      setRelativeTime(`${hours} hour${hours !== 1 ? 's' : ''} ago`);
+    } else if (days < 7) {
+      setRelativeTime(`${days} day${days !== 1 ? 's' : ''} ago`);
+    } else {
+      setRelativeTime(new Date(date).toLocaleDateString());
+    }
+  }, [date]);
+
+  return relativeTime;
 }
 
 export function ItemCard({ item, itemType }: ItemCardProps) {
   const Icon = itemType ? iconMap[itemType.icon] || File : File;
   const typeColor = itemType?.color || '#6b7280';
   const typeName = itemType?.name || 'file';
+  const relativeTime = useRelativeTime(item.updatedAt);
 
-  // Mock tags for display
-  const mockTags = ['react', 'hooks', 'ai', 'bash'].slice(0, Math.floor(Math.random() * 3) + 1);
+  // Mock tags for display - deterministic based on item id
+  const tagOptions = ['react', 'hooks', 'ai', 'bash'];
+  const tagCount = (item.id.charCodeAt(item.id.length - 1) % 3) + 1;
+  const mockTags = tagOptions.slice(0, tagCount);
 
   return (
     <div
@@ -120,7 +142,7 @@ export function ItemCard({ item, itemType }: ItemCardProps) {
           {typeLabels[typeName] || typeName}
         </span>
         <span>•</span>
-        <span>{getRelativeTime(item.updatedAt)}</span>
+        <span>{relativeTime}</span>
       </div>
 
       {/* Description */}
