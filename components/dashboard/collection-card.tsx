@@ -11,22 +11,31 @@ export function CollectionCard({ collection }: CollectionCardProps) {
   // Get the default type color for the left border accent
   const accentColor = collection.defaultType?.color || '#6b7280';
 
+  // Calculate overflow count
+  const overflowCount = collection.itemCount > 3 ? collection.itemCount - 3 : 0;
+
   return (
     <div
       className="group relative cursor-pointer overflow-hidden rounded-xl border bg-card p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
       style={{ borderLeftWidth: '4px', borderLeftColor: accentColor }}
     >
-      {/* Top row: type icon */}
-      <div className="mb-3 flex gap-1.5">
-        {collection.defaultType && (
+      {/* Top row: item type icons */}
+      <div className="mb-3 flex items-center gap-1.5">
+        {collection.topItems.map((item, index) => (
           <div
+            key={index}
             className="flex h-7 w-7 items-center justify-center rounded-md"
             style={{
-              backgroundColor: `${accentColor}20`,
-              color: accentColor
+              backgroundColor: `${item.color}20`,
+              color: item.color
             }}
           >
-            {renderIcon(collection.defaultType.icon, { className: 'h-3.5 w-3.5' })}
+            {renderIcon(item.icon, { className: 'h-3.5 w-3.5' })}
+          </div>
+        ))}
+        {overflowCount > 0 && (
+          <div className="flex h-7 items-center justify-center rounded-md bg-muted px-2 text-xs font-medium text-muted-foreground">
+            +{overflowCount}
           </div>
         )}
       </div>

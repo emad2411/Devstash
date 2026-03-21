@@ -18,6 +18,12 @@ export interface DashboardItem {
   };
 }
 
+/** Serializable item type for collection display */
+interface CollectionItemType {
+  icon: string;
+  color: string;
+}
+
 /** Serializable collection for dashboard display */
 export interface DashboardCollection {
   id: string;
@@ -31,4 +37,5 @@ export interface DashboardCollection {
     icon: string;
     color: string;
   } | null;
+  topItems: CollectionItemType[];
 }

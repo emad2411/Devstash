@@ -54,7 +54,7 @@ export async function getItemTypes(userId: string) {
   }));
 }
 
-/** Fetch user's collections with item counts */
+/** Fetch user's collections with item counts and most common item type color */
 export async function getCollections(userId: string) {
   const collections = await prisma.collection.findMany({
     where: { userId },
@@ -76,19 +76,51 @@ export async function getCollections(userId: string) {
           color: true,
         },
       },
+      items: {
+        select: {
+          item: {
+            select: {
+              itemType: {
+                select: {
+                  color: true,
+                },
+              },
+            },
+          },
+        },
+      },
     },
     orderBy: { name: "asc" },
   });
 
-  return collections.map((collection) => ({
-    id: collection.id,
-    name: collection.name,
-    description: collection.description,
-    isFavorite: collection.isFavorite,
-    defaultTypeId: collection.defaultTypeId,
-    itemCount: collection._count.items,
-    defaultType: collection.defaultType,
-  }));
+  return collections.map((collection) => {
+    // Compute most common item type color
+    const colorCounts = new Map<string, number>();
+    collection.items.forEach((ic) => {
+      const color = ic.item.itemType.color;
+      colorCounts.set(color, (colorCounts.get(color) || 0) + 1);
+    });
+
+    let mostCommonColor = collection.defaultType?.color || '#6b7280';
+    let maxCount = 0;
+    colorCounts.forEach((count, color) => {
+      if (count > maxCount) {
+        maxCount = count;
+        mostCommonColor = color;
+      }
+    });
+
+    return {
+      id: collection.id,
+      name: collection.name,
+      description: collection.description,
+      isFavorite: collection.isFavorite,
+      defaultTypeId: collection.defaultTypeId,
+      itemCount: collection._count.items,
+      defaultType: collection.defaultType,
+      mostCommonColor,
+    };
+  });
 }
 
 /** Fetch recent items with their itemType included */
@@ -143,7 +175,7 @@ export async function getRecentItems(userId: string, limit = 8) {
   }));
 }
 
-/** Fetch favorite/pinned collections with item counts */
+/** Fetch favorite/pinned collections with item counts and top 3 items */
 export async function getPinnedCollections(userId: string) {
   const collections = await prisma.collection.findMany({
     where: {
@@ -168,6 +200,22 @@ export async function getPinnedCollections(userId: string) {
           color: true,
         },
       },
+      items: {
+        take: 3,
+        orderBy: { addedAt: "desc" },
+        select: {
+          item: {
+            select: {
+              itemType: {
+                select: {
+                  icon: true,
+                  color: true,
+                },
+              },
+            },
+          },
+        },
+      },
     },
     orderBy: { name: "asc" },
   });
@@ -180,6 +228,10 @@ export async function getPinnedCollections(userId: string) {
     defaultTypeId: collection.defaultTypeId,
     itemCount: collection._count.items,
     defaultType: collection.defaultType,
+    topItems: collection.items.map((ic) => ({
+      icon: ic.item.itemType.icon,
+      color: ic.item.itemType.color,
+    })),
   }));
 }
 

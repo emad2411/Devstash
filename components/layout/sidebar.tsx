@@ -29,6 +29,7 @@ interface NavItemData {
   label: string;
   icon: string;
   color: string;
+  itemCount: number;
 }
 
 function NavItem({
@@ -42,6 +43,8 @@ function NavItem({
   isOpen: boolean;
   onClick: () => void;
 }) {
+  const isPro = item.label.toLowerCase() === 'file' || item.label.toLowerCase() === 'image';
+
   const content = (
     <button
       onClick={onClick}
@@ -64,7 +67,19 @@ function NavItem({
       })}
 
       {isOpen && (
-        <span className="truncate text-sm font-medium">{item.label}</span>
+        <div className="flex flex-1 items-center justify-between overflow-hidden">
+          <div className="flex items-center gap-2">
+            <span className="truncate text-sm font-medium">{item.label}</span>
+            {isPro && (
+              <span className="rounded bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-amber-500">
+                Pro
+              </span>
+            )}
+          </div>
+          <span className="text-xs text-muted-foreground">
+            {item.itemCount}
+          </span>
+        </div>
       )}
     </button>
   );
@@ -74,7 +89,14 @@ function NavItem({
       <Tooltip>
         <TooltipTrigger render={content} />
         <TooltipContent side="right" className="ml-2">
-          {item.label}
+          <div className="flex items-center gap-2">
+            <span>{item.label}</span>
+            {isPro && (
+              <span className="rounded bg-amber-500/20 px-1 py-0.5 text-[10px] font-semibold text-amber-400">
+                Pro
+              </span>
+            )}
+          </div>
         </TooltipContent>
       </Tooltip>
     );
@@ -92,10 +114,13 @@ function CollectionItem({
 }) {
   const content = (
     <button className="group flex w-full items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-colors hover:bg-accent/50 hover:text-foreground">
-      <Folder className="shrink-0" size={18} />
+      <div
+        className="h-3 w-3 shrink-0 rounded-full"
+        style={{ backgroundColor: collection.color }}
+      />
       {isOpen && (
         <>
-          <span className="flex-1 truncate text-sm">{collection.name}</span>
+          <span className="flex-1 truncate text-sm text-left">{collection.name}</span>
           <span className="text-xs text-muted-foreground">
             {collection.count}
           </span>
@@ -126,13 +151,15 @@ export function Sidebar({
   navItems,
 }: SidebarProps) {
   // "All Items" is prepended as a static entry
+  const totalCount = navItems.reduce((sum, item) => sum + item.itemCount, 0);
   const allNavItems: NavItemData[] = [
-    { id: 'all', label: 'All Items', icon: 'Grid3X3', color: '#6b7280' },
+    { id: 'all', label: 'All Items', icon: 'Grid3X3', color: '#6b7280', itemCount: totalCount },
     ...navItems.map((item) => ({
       id: item.id,
       label: item.name,
       icon: item.icon,
       color: item.color,
+      itemCount: item.itemCount,
     })),
   ];
   return (

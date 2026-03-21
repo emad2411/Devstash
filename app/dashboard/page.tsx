@@ -18,7 +18,7 @@ export default async function DashboardPage() {
   await connection(); // Next.js 16: opt into dynamic rendering
 
   const user = await getDemoUser();
-  const [itemTypes, collections, recentItems, pinnedCollections, stats] =
+  const [itemTypesRaw, collections, recentItems, pinnedCollections, stats] =
     await Promise.all([
       getItemTypes(user.id),
       getCollections(user.id),
@@ -27,11 +27,21 @@ export default async function DashboardPage() {
       getDashboardStats(user.id),
     ]);
 
+  // Sort itemTypes so "File" and "Image" appear at the end (Pro features)
+  const itemTypes = [...itemTypesRaw].sort((a, b) => {
+    const isAPro = a.name.toLowerCase() === 'file' || a.name.toLowerCase() === 'image';
+    const isBPro = b.name.toLowerCase() === 'file' || b.name.toLowerCase() === 'image';
+    if (isAPro && !isBPro) return 1;
+    if (!isAPro && isBPro) return -1;
+    return a.name.localeCompare(b.name);
+  });
+
   // Transform collections for sidebar
   const sidebarCollections: SidebarCollection[] = collections.map((c) => ({
     id: c.id,
     name: c.name,
     count: c.itemCount,
+    color: c.mostCommonColor,
   }));
 
   return (
