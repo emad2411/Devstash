@@ -1,6 +1,6 @@
 # Current Feature
 
-Phase 1: Core Auth Configuration
+Phase 2: Auth Utilities & Server Actions
 
 ## Status
 
@@ -8,44 +8,34 @@ Complete
 
 ## Goals
 
-- [x] Install auth dependencies: `next-auth@beta`, `@auth/prisma-adapter`, `zod`
-- [x] Create edge-safe `auth.config.ts` with GitHub OAuth + Credentials providers
-- [x] Create `auth.ts` with Prisma adapter and JWT session strategy
-- [x] Create `proxy.ts` middleware for route protection
-- [x] Create `.env.example` with required environment variables
-- [x] Run build verification to ensure no edge/Node.js runtime conflicts
+- [x] Create `lib/auth-utils.ts` with `getCurrentUser()` and `requireAuth()` helpers
+- [x] Create `lib/validations.ts` with Zod schemas for sign-in and sign-up forms
+- [x] Create `actions/auth.ts` with `loginAction()`, `registerAction()`, and `logoutAction()`
+- [x] Run lint check to verify code quality
 
 ## Notes
 
-### Architecture Pattern
-Following Auth.js v5 best practices with edge-compatible configuration:
-- `auth.config.ts` — Edge-safe, contains only providers and callbacks, NO DB/Prisma imports
-- `auth.ts` — Full Node.js config that merges auth.config.ts + adds Prisma adapter
-- `proxy.ts` — Edge-compatible middleware for route protection
+### Auth Utils Pattern
+- `getCurrentUser()` — calls `auth()`, returns `session.user` or `null`
+- `requireAuth()` — calls `auth()`, throws/redirects if not authenticated
 
-### Key Technical Decisions
-- Use `authorized` callback in middleware to control route access
-- Custom sign-in page at `/login`
-- Credentials provider with `email` and `password` fields
-- Lazy-import `authorize` function to avoid pulling Node.js deps into edge
-- JWT session strategy with Prisma adapter
+### Validation Schemas (Zod)
+- `signInSchema`: email (valid email), password (min 8 chars)
+- `signUpSchema`: extends signInSchema + name field + password confirmation
+- Reference: https://zod.dev/api
 
-### Environment Variables Required
-- `DATABASE_URL` — PostgreSQL connection string
-- `AUTH_SECRET` — Generate with `npx auth secret`
-- `AUTH_GITHUB_ID` — GitHub OAuth app ID
-- `AUTH_GITHUB_SECRET` — GitHub OAuth app secret
+### Server Actions Pattern
+- `loginAction(formData)` — validates with Zod, calls `signIn("credentials", ...)`
+- `registerAction(formData)` — validates, hashes password with bcryptjs, creates user via Prisma, then signs in
+- `logoutAction()` — calls `signOut()`
 
 ### Files Created
-- `auth.config.ts` — Edge-safe auth configuration
-- `auth.ts` — Full auth config with Prisma adapter
-- `proxy.ts` — Edge middleware for route protection
-- `.env.example` — Environment variable template
-- `types/next-auth.d.ts` — Extended TypeScript types for session/user
-- `app/api/auth/[...nextauth]/route.ts` — API route handler
+- `lib/auth-utils.ts` — Server-side auth helpers
+- `lib/validations.ts` — Zod schemas for auth forms
+- `actions/auth.ts` — Server actions for login, register, logout
 
-### Build Verification
-Build completed successfully with no edge/Node.js runtime conflicts.
+### Verification
+Lint passed with no errors in new code.
 
 ## History
 
@@ -60,3 +50,4 @@ Build completed successfully with no edge/Node.js runtime conflicts.
 - Database-Driven Dashboard: Replaced mock data with Prisma queries, added icon-map.tsx with renderIcon helper, fixed React compiler errors
 - **Dashboard & Sidebar Improvements (2026-03-21)**: Montserrat font, sidebar Pro badges, item counts, colored collection circles, pinned collection item icons with +N overflow badge
 - **Phase 1: Core Auth Configuration (2026-03-26)**: Edge-compatible auth setup with Next-Auth v5, Prisma adapter, GitHub OAuth + Credentials providers, middleware protection
+- **Phase 2: Auth Utilities & Server Actions (2026-03-27)**: Auth helpers, Zod validations, and server actions for login/register/logout

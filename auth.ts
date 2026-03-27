@@ -5,6 +5,8 @@ import { authConfig } from "./auth.config"
 import Credentials from "next-auth/providers/credentials"
 import { z } from "zod"
 import bcrypt from "bcryptjs"
+import type { Adapter } from 'next-auth/adapters';
+
 
 const credentialsSchema = z.object({
   email: z.string().email(),
@@ -37,7 +39,7 @@ export const {
   signIn,
   signOut,
 } = NextAuth({
-  adapter: PrismaAdapter(prisma) as any,
+  adapter: PrismaAdapter(prisma) as Adapter,
   ...authConfig,
   providers: [
     ...authConfig.providers,
