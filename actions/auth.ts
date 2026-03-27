@@ -7,7 +7,7 @@ import bcrypt from "bcryptjs"
 import { AuthError } from "next-auth"
 import { redirect } from "next/navigation"
 
-export async function loginAction(formData: FormData) {
+export async function loginAction(prevState: unknown, formData: FormData) {
   const validatedFields = signInSchema.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
@@ -38,7 +38,7 @@ export async function loginAction(formData: FormData) {
   redirect("/dashboard")
 }
 
-export async function registerAction(formData: FormData) {
+export async function registerAction(prevState: unknown, formData: FormData) {
   const validatedFields = signUpSchema.safeParse({
     name: formData.get("name"),
     email: formData.get("email"),

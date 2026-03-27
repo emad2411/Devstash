@@ -5,7 +5,12 @@ import Credentials from "next-auth/providers/credentials"
 // Edge-safe auth config - NO database/Prisma imports
 // Database operations are handled in auth.ts via lazy imports
 export const authConfig = {
-  providers: [GitHub],
+  providers: [
+    GitHub({
+      clientId: process.env.GITHUB_CLIENT_ID!,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
+    }),
+  ],
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user
