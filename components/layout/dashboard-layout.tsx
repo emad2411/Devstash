@@ -10,9 +10,10 @@ interface DashboardLayoutProps {
   children: React.ReactNode;
   collections: SidebarCollection[];
   navItems: SidebarNavItem[];
+  user?: { id: string; name?: string | null; email?: string | null; image?: string | null; isPro?: boolean | null };
 }
 
-export function DashboardLayout({ children, collections, navItems }: DashboardLayoutProps) {
+export function DashboardLayout({ children, collections, navItems, user }: DashboardLayoutProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [activeItem, setActiveItem] = useState('all');
 
@@ -30,6 +31,7 @@ export function DashboardLayout({ children, collections, navItems }: DashboardLa
           onItemClick={setActiveItem}
           collections={collections}
           navItems={navItems}
+          user={user}
         />
         <main className="flex-1 overflow-auto bg-muted/30 p-6">
           {children}

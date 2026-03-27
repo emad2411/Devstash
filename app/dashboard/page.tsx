@@ -7,17 +7,32 @@ import { WelcomeHeader } from "@/components/dashboard/welcome-header";
 import {
   getCollections,
   getDashboardStats,
-  getDemoUser,
   getItemTypes,
   getPinnedCollections,
   getRecentItems,
 } from "@/lib/queries";
+import { requireAuth } from "@/lib/auth-utils";
+import { prisma } from "@/lib/prisma";
 import { SidebarCollection } from "@/types/layout";
 
 export default async function DashboardPage() {
   await connection(); // Next.js 16: opt into dynamic rendering
+  const sessionUser = await requireAuth();
 
-  const user = await getDemoUser();
+  const user = await prisma.user.findUnique({
+    where: { id: sessionUser.id },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      image: true,
+      isPro: true,
+    },
+  });
+
+  if (!user) {
+    throw new Error('Authenticated user not found in database');
+  }
   const [itemTypesRaw, collections, recentItems, pinnedCollections, stats] =
     await Promise.all([
       getItemTypes(user.id),
@@ -48,6 +63,7 @@ export default async function DashboardPage() {
     <DashboardLayout
       collections={sidebarCollections}
       navItems={itemTypes}
+      user={user}
     >
       <div className="mx-auto max-w-7xl">
         <WelcomeHeader

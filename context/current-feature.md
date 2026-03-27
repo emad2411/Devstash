@@ -1,62 +1,40 @@
 # Current Feature
 
-Phase 3: Auth UI & Dashboard Protection
+Phase 4: User Profile UI Integration
 
 ## Status
 
-Complete
+Completed
 
 ## Goals
 
-- [x] Create `app/(auth)/layout.tsx` — minimal centered layout for auth pages
-- [x] Create `app/(auth)/login/page.tsx` — login form with email/password + GitHub OAuth
-- [x] Create `app/(auth)/register/page.tsx` — registration form with all fields + GitHub OAuth
-- [x] Modify `app/dashboard/layout.tsx` — add server-side session check with redirect
-- [x] Build verification passed
+- Replace the hardcoded demo user with the real authenticated user across the Dashboard and Sidebar.
+- Surface `isPro` and avatar image in the Sidebar and Dashboard welcome header.
+- Pass a full `dbUser` (including `{ name, email, image, isPro }`) from server components to layout and child components.
+- Add a reliable `getInitials(name?)` helper for avatar fallbacks and compute initials dynamically.
+- Ensure auth redirects and UI reflect the real user data (name, avatar, plan status).
 
 ## Notes
 
-### Auth UI Structure
-```
-app/(auth)/
-├── layout.tsx      # Minimal centered layout (no sidebar/navbar)
-├── login/
-│   └── page.tsx    # Email/password form, GitHub button, link to register
-└── register/
-    └── page.tsx    # Name/email/password/confirm form, GitHub button, link to login
-```
+### User Model / Review
+- Confirm that querying `prisma.user` in `app/dashboard/page.tsx` to retrieve `isPro` and other fields is acceptable. If so, fetch the full `dbUser` by session user ID.
 
-### Login Page Features
-- Email/password form using `useActionState`
-- GitHub OAuth button
-- Link to register page
-- Error handling from server actions
+### Proposed Changes (summary)
+- `app/dashboard/page.tsx`: replace `getDemoUser()` with `requireAuth()`; query `prisma.user.findUnique` for full user; pass `user` prop into `DashboardLayout`.
+- `components/layout/dashboard-layout.tsx`: update props to accept `user` and forward to `Sidebar`.
+- `components/layout/sidebar.tsx`: accept `user`; render `<AvatarImage src={user.image} />`; compute initials from `user.name` or fallback to "Dev"; show `user.name || user.email`; render plan based on `user.isPro`.
+- `lib/utils.ts`: add `getInitials(name?: string | null)` helper.
+- Update any types/interfaces for `DashboardLayoutProps` and `SidebarProps` to include the `user` shape.
 
-### Register Page Features
-- Name, email, password, confirm password form
-- GitHub OAuth button
-- Link to login page
-- Error handling from server actions
+### Verification Plan
 
-### Dashboard Protection
-- Server-side session check in `app/dashboard/layout.tsx`
-- Redirect to `/login` if not authenticated
-- Uses `requireAuth()` from `lib/auth-utils.ts`
-
-### Files Created
-- `app/(auth)/layout.tsx` — Auth group layout
-- `app/(auth)/login/page.tsx` — Login page with form + GitHub OAuth
-- `app/(auth)/register/page.tsx` — Registration page with form + GitHub OAuth
-- `app/dashboard/layout.tsx` — Protected dashboard layout
-- `components/ui/card.tsx` — shadcn Card component
-- `components/ui/label.tsx` — shadcn Label component
-
-### Build Verification
-Build completed successfully with all routes:
-- `/login` — Static page
-- `/register` — Static page
-- `/dashboard` — Dynamic (server-rendered with auth check)
-- `/api/auth/[...nextauth]` — Dynamic API route
+Manual steps:
+1. Run `npm run dev`.
+2. Navigate to `http://localhost:3000` and confirm redirect to `/login` when unauthenticated.
+3. Authenticate (Credentials or GitHub OAuth).
+4. Verify Dashboard Welcome Header displays your real name.
+5. Expand Sidebar: your avatar image should display and name/plan status should match your account.
+6. Collapse Sidebar: tooltip should show name and plan over mini-avatar.
 
 ## History
 
@@ -73,3 +51,4 @@ Build completed successfully with all routes:
 - **Phase 1: Core Auth Configuration (2026-03-26)**: Edge-compatible auth setup with Next-Auth v5, Prisma adapter, GitHub OAuth + Credentials providers, middleware protection
 - **Phase 2: Auth Utilities & Server Actions (2026-03-27)**: Auth helpers, Zod validations, and server actions for login/register/logout
 - **Phase 3: Auth UI & Dashboard Protection (2026-03-27)**: Login/register pages with NextAuth.js integration, protected dashboard routes
+- **Phase 4: User Profile UI Integration (2026-03-27)**: Replace demo user with real authenticated user and surface plan/avatar in UI

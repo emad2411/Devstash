@@ -2,7 +2,7 @@
 
 import { ChevronRight, Folder, Settings } from 'lucide-react';
 
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
   Tooltip,
@@ -11,7 +11,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { renderIcon } from '@/lib/icon-map';
-import { cn } from '@/lib/utils';
+import { cn, getInitials } from '@/lib/utils';
 import { SidebarCollection, SidebarNavItem } from '@/types/layout';
 
 interface SidebarProps {
@@ -21,6 +21,7 @@ interface SidebarProps {
   onItemClick: (item: string) => void;
   collections: SidebarCollection[];
   navItems: SidebarNavItem[];
+  user?: { id: string; name?: string | null; email?: string | null; image?: string | null; isPro?: boolean | null };
 }
 
 
@@ -149,6 +150,7 @@ export function Sidebar({
   onItemClick,
   collections,
   navItems,
+  user,
 }: SidebarProps) {
   // "All Items" is prepended as a static entry
   const totalCount = navItems.reduce((sum, item) => sum + item.itemCount, 0);
@@ -236,13 +238,17 @@ export function Sidebar({
           {isOpen ? (
             <div className="flex items-center gap-3">
               <Avatar className="h-9 w-9">
-                <AvatarFallback className="bg-primary text-primary-foreground text-sm font-medium">
-                  JD
-                </AvatarFallback>
+                {user?.image ? (
+                  <AvatarImage src={user.image} alt={user.name ?? user.email ?? 'User avatar'} />
+                ) : (
+                  <AvatarFallback className="bg-primary text-primary-foreground text-sm font-medium">
+                    {getInitials(user?.name)}
+                  </AvatarFallback>
+                )}
               </Avatar>
               <div className="flex min-w-0 flex-1 flex-col">
-                <span className="truncate text-sm font-medium">John Doe</span>
-                <span className="text-xs text-blue-500">Pro Plan</span>
+                <span className="truncate text-sm font-medium">{user?.name ?? user?.email ?? 'Developer'}</span>
+                <span className="text-xs text-blue-500">{user?.isPro ? 'Pro Plan' : 'Free Plan'}</span>
               </div>
               <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
                 <Settings className="h-4 w-4 text-muted-foreground" />
@@ -254,14 +260,18 @@ export function Sidebar({
                 <TooltipTrigger
                   render={
                     <Avatar className="h-8 w-8 cursor-pointer">
-                      <AvatarFallback className="bg-primary text-primary-foreground text-xs font-medium">
-                        JD
-                      </AvatarFallback>
+                      {user?.image ? (
+                        <AvatarImage src={user.image} alt={user.name ?? user.email ?? 'User avatar'} />
+                      ) : (
+                        <AvatarFallback className="bg-primary text-primary-foreground text-xs font-medium">
+                          {getInitials(user?.name)}
+                        </AvatarFallback>
+                      )}
                     </Avatar>
                   }
                 />
                 <TooltipContent side="right" className="ml-2">
-                  John Doe - Pro Plan
+                  {user?.name ?? user?.email ?? 'Developer'} - {user?.isPro ? 'Pro Plan' : 'Free Plan'}
                 </TooltipContent>
               </Tooltip>
               <Tooltip>
