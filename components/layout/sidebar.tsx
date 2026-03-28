@@ -1,15 +1,23 @@
 'use client';
 
-import { ChevronRight, Folder, Settings } from 'lucide-react';
+import { ChevronRight, Folder, LogOut, Settings, User } from 'lucide-react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { logoutAction } from '@/actions/auth';
 import { renderIcon } from '@/lib/icon-map';
 import { cn, getInitials } from '@/lib/utils';
 import { SidebarCollection, SidebarNavItem } from '@/types/layout';
@@ -236,44 +244,88 @@ export function Sidebar({
           )}
         >
           {isOpen ? (
-            <div className="flex items-center gap-3">
-              <Avatar className="h-9 w-9">
-                {user?.image ? (
-                  <AvatarImage src={user.image} alt={user.name ?? user.email ?? 'User avatar'} />
-                ) : (
-                  <AvatarFallback className="bg-primary text-primary-foreground text-sm font-medium">
-                    {getInitials(user?.name)}
-                  </AvatarFallback>
-                )}
-              </Avatar>
-              <div className="flex min-w-0 flex-1 flex-col">
-                <span className="truncate text-sm font-medium">{user?.name ?? user?.email ?? 'Developer'}</span>
-                <span className="text-xs text-blue-500">{user?.isPro ? 'Pro Plan' : 'Free Plan'}</span>
-              </div>
-              <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
-                <Settings className="h-4 w-4 text-muted-foreground" />
-              </Button>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center gap-2">
-              <Tooltip>
-                <TooltipTrigger
+            <DropdownMenu>
+              <div className="flex items-center gap-3">
+                <DropdownMenuTrigger
                   render={
-                    <Avatar className="h-8 w-8 cursor-pointer">
-                      {user?.image ? (
-                        <AvatarImage src={user.image} alt={user.name ?? user.email ?? 'User avatar'} />
-                      ) : (
-                        <AvatarFallback className="bg-primary text-primary-foreground text-xs font-medium">
-                          {getInitials(user?.name)}
-                        </AvatarFallback>
-                      )}
-                    </Avatar>
+                    <button className="relative flex h-9 w-9 items-center justify-center rounded-full outline-none focus-visible:ring-2 focus-visible:ring-primary">
+                      <Avatar className="h-9 w-9">
+                        {user?.image ? (
+                          <AvatarImage src={user.image} alt={user.name ?? user.email ?? 'User avatar'} />
+                        ) : (
+                          <AvatarFallback className="bg-primary text-primary-foreground text-sm font-medium">
+                            {getInitials(user?.name)}
+                          </AvatarFallback>
+                        )}
+                      </Avatar>
+                    </button>
                   }
                 />
-                <TooltipContent side="right" className="ml-2">
-                  {user?.name ?? user?.email ?? 'Developer'} - {user?.isPro ? 'Pro Plan' : 'Free Plan'}
-                </TooltipContent>
-              </Tooltip>
+                <div className="flex min-w-0 flex-1 flex-col">
+                  <span className="truncate text-sm font-medium">{user?.name ?? user?.email ?? 'Developer'}</span>
+                  <span className="text-xs text-blue-500">{user?.isPro ? 'Pro Plan' : 'Free Plan'}</span>
+                </div>
+                <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
+                  <Settings className="h-4 w-4 text-muted-foreground" />
+                </Button>
+              </div>
+              <DropdownMenuContent align="start" className="w-48">
+                <DropdownMenuItem className="cursor-pointer">
+                  <User className="mr-2 h-4 w-4" />
+                  Profile
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="cursor-pointer text-red-500 focus:text-red-500"
+                  onClick={() => logoutAction()}
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Sign Out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <div className="flex flex-col items-center gap-2">
+              <DropdownMenu>
+                <Tooltip>
+                  <TooltipTrigger
+                    render={
+                      <DropdownMenuTrigger
+                        render={
+                          <button className="relative flex h-8 w-8 items-center justify-center rounded-full outline-none focus-visible:ring-2 focus-visible:ring-primary">
+                            <Avatar className="h-8 w-8">
+                              {user?.image ? (
+                                <AvatarImage src={user.image} alt={user.name ?? user.email ?? 'User avatar'} />
+                              ) : (
+                                <AvatarFallback className="bg-primary text-primary-foreground text-xs font-medium">
+                                  {getInitials(user?.name)}
+                                </AvatarFallback>
+                              )}
+                            </Avatar>
+                          </button>
+                        }
+                      />
+                    }
+                  />
+                  <TooltipContent side="right" className="ml-2">
+                    {user?.name ?? user?.email ?? 'Developer'} - {user?.isPro ? 'Pro Plan' : 'Free Plan'}
+                  </TooltipContent>
+                </Tooltip>
+                <DropdownMenuContent align="start" className="w-48">
+                  <DropdownMenuItem className="cursor-pointer">
+                    <User className="mr-2 h-4 w-4" />
+                    Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    className="cursor-pointer text-red-500 focus:text-red-500"
+                    onClick={() => logoutAction()}
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
               <Tooltip>
                 <TooltipTrigger
                   render={
