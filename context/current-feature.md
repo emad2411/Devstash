@@ -1,68 +1,16 @@
 # Current Feature
 
-Phase 4.1: Refactor Auth Pages to Server Components
-
 ## Status
 
-In Progress
+Not Started
 
 ## Goals
 
-- Remove `'use client'` from login and register page files
-- Create client components for the form logic (`LoginForm`, `RegisterForm`)
-- Convert auth pages to server components that render the client form components
-- Preserve all existing functionality (form submission, validation, OAuth, error handling)
-- Build must pass with no errors
+<!-- Goals go here -->
 
 ## Notes
 
-### Root Cause Analysis
-
-Two things force `'use client'` on the pages:
-
-| Reason | Code | Impact |
-|--------|------|--------|
-| `useActionState` hook | `const [state, formAction, isPending] = useActionState(...)` | Requires React client hooks |
-| `signIn` from `next-auth/react` | `onClick={() => signIn("github", ...)}` | Client-side import + event handler |
-
-### Proposed Changes
-
-**NEW** `components/auth/login-form.tsx`:
-- Extract entire login card (form + OAuth + link) into `'use client'` component
-- Contains `useActionState(loginAction, null)` and `signIn("github")`
-
-**NEW** `components/auth/register-form.tsx`:
-- Extract entire register card (form + OAuth + link) into `'use client'` component
-- Contains `useActionState(registerAction, null)` and `signIn("github")`
-
-**MODIFY** `app/(auth)/login/page.tsx`:
-- Remove `'use client'` directive
-- Remove all component logic
-- Import and render `<LoginForm />` as server component page
-
-**MODIFY** `app/(auth)/register/page.tsx`:
-- Remove `'use client'` directive
-- Remove all component logic
-- Import and render `<RegisterForm />` as server component page
-
-### No Changes Required
-
-- `actions/auth.ts` — Already uses `"use server"`, no changes needed
-- `app/(auth)/layout.tsx` — Already a server component, no changes needed
-
-### Verification Plan
-
-**Automated:**
-```bash
-npm run build
-```
-Build must pass with no errors.
-
-**Manual:**
-1. Run `npm run dev`
-2. Navigate to `/login` — form renders, submit works, GitHub OAuth works
-3. Navigate to `/register` — form renders, submit works, GitHub OAuth works
-4. Submit empty forms — validation errors display inline
+<!-- Notes go here -->
 
 ## History
 
@@ -80,3 +28,4 @@ Build must pass with no errors.
 - **Phase 2: Auth Utilities & Server Actions (2026-03-27)**: Auth helpers, Zod validations, and server actions for login/register/logout
 - **Phase 3: Auth UI & Dashboard Protection (2026-03-27)**: Login/register pages with NextAuth.js integration, protected dashboard routes
 - **Phase 4: User Profile UI Integration (2026-03-27)**: Replace demo user with real authenticated user and surface plan/avatar in UI
+- **Phase 4.1: Auth Pages Server Component Refactor (2026-03-28)**: Converted login/register pages to server components by extracting form logic into client components
