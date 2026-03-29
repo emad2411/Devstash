@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useRef } from "react";
 import { loginAction } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,6 +18,11 @@ import { signIn } from "next-auth/react";
 
 export function LoginForm() {
   const [state, formAction, isPending] = useActionState(loginAction, null);
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const emailValue = formRef.current?.querySelector<HTMLInputElement>(
+    'input[name="email"]'
+  )?.value;
 
   return (
     <Card className="border-[#262626] bg-[#1a1a1a]">
@@ -30,7 +35,7 @@ export function LoginForm() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <form action={formAction} className="space-y-4">
+        <form ref={formRef} action={formAction} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email" className="text-[#fafafa]">
               Email
@@ -64,7 +69,17 @@ export function LoginForm() {
             )}
           </div>
           {state?.error && (
-            <p className="text-sm text-red-500">{state.error}</p>
+            <div className="space-y-2">
+              <p className="text-sm text-red-500">{state.error}</p>
+              {state?.code === "EMAIL_NOT_VERIFIED" && emailValue && (
+                <Link
+                  href={`/verify-email?email=${encodeURIComponent(emailValue)}`}
+                  className="text-sm text-[#3b82f6] hover:text-[#2563eb] hover:underline inline-block"
+                >
+                  Resend verification email
+                </Link>
+              )}
+            </div>
           )}
           <Button
             type="submit"

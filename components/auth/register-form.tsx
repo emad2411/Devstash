@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { registerAction } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,7 +18,15 @@ import Link from "next/link";
 import { signIn } from "next-auth/react";
 
 export function RegisterForm() {
+  const router = useRouter();
   const [state, formAction, isPending] = useActionState(registerAction, null);
+
+  // Redirect to verification page on successful registration
+  useEffect(() => {
+    if (state?.success && state?.email) {
+      router.push(`/verify-email?email=${encodeURIComponent(state.email)}`);
+    }
+  }, [state, router]);
 
   return (
     <Card className="border-[#262626] bg-[#1a1a1a]">

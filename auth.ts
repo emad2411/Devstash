@@ -24,6 +24,7 @@ async function getUser(email: string) {
         image: true,
         password: true,
         isPro: true,
+        emailVerified: true,
       },
     })
     return user
@@ -41,6 +42,19 @@ export const {
 } = NextAuth({
   adapter: PrismaAdapter(prisma) as Adapter,
   ...authConfig,
+  callbacks: {
+    ...authConfig.callbacks,
+    async signIn({ user, account }) {
+      // Auto-verify GitHub OAuth users
+      if (account?.provider === "github" && user.email) {
+        await prisma.user.updateMany({
+          where: { email: user.email, emailVerified: null },
+          data: { emailVerified: new Date() },
+        })
+      }
+      return true
+    },
+  },
   providers: [
     ...authConfig.providers,
     Credentials({
@@ -67,6 +81,11 @@ export const {
 
         if (!passwordsMatch) {
           return null
+        }
+
+        // Block login for unverified users
+        if (!user.emailVerified) {
+          throw new Error("EMAIL_NOT_VERIFIED")
         }
 
         return {

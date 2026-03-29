@@ -10,7 +10,9 @@ export default proxy((req) => {
 
   // Protected routes
   const isOnDashboard = nextUrl.pathname.startsWith("/dashboard")
-  const isOnApi = nextUrl.pathname.startsWith("/api") && !nextUrl.pathname.startsWith("/api/auth")
+  const isOnApi = nextUrl.pathname.startsWith("/api") &&
+    !nextUrl.pathname.startsWith("/api/auth") &&
+    !nextUrl.pathname.startsWith("/api/verify-email")
 
   if ((isOnDashboard || isOnApi) && !isLoggedIn) {
     const callbackUrl = encodeURIComponent(nextUrl.pathname + nextUrl.search)
@@ -22,5 +24,7 @@ export default proxy((req) => {
 })
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"],
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|api/verify-email|api/auth|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+  ],
 }
