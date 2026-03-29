@@ -51,7 +51,6 @@ export const authConfig = {
   },
   pages: {
     signIn: "/login",
-    newUser: "/register",
   },
   session: {
     strategy: "jwt",

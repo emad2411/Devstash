@@ -1,7 +1,9 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { resendVerificationAction } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,20 +14,38 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Field, FieldLabel, FieldError } from "@/components/ui/field";
 import { Mail, Loader2, CheckCircle } from "lucide-react";
 import Link from "next/link";
+import { resendVerificationSchema, type ResendVerificationInput } from "@/lib/validations";
 
 export function ResendVerificationForm() {
   const searchParams = useSearchParams();
   const urlEmail = searchParams.get("email");
-  const [email, setEmail] = useState(urlEmail || "");
   const [countdown, setCountdown] = useState(0);
+  const [serverSuccess, setServerSuccess] = useState(false);
+  const [serverMessage, setServerMessage] = useState("");
+  const [serverError, setServerError] = useState("");
+  const [isPending, setIsPending] = useState(false);
 
-  const [state, formAction, isPending] = useActionState(
-    resendVerificationAction,
-    null
-  );
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+  } = useForm<ResendVerificationInput>({
+    resolver: zodResolver(resendVerificationSchema),
+    defaultValues: {
+      email: urlEmail || "",
+    },
+  });
+
+  // Update form value when urlEmail changes
+  useEffect(() => {
+    if (urlEmail) {
+      setValue("email", urlEmail);
+    }
+  }, [urlEmail, setValue]);
 
   // Handle countdown for resend cooldown
   useEffect(() => {
@@ -35,12 +55,30 @@ export function ResendVerificationForm() {
     }
   }, [countdown]);
 
-  // Start countdown after successful resend
-  useEffect(() => {
-    if (state && "success" in state && state.success) {
-      setCountdown(60);
+  const onSubmit = async (data: ResendVerificationInput) => {
+    setIsPending(true);
+    setServerSuccess(false);
+    setServerError("");
+
+    const formData = new FormData();
+    formData.append("email", data.email);
+
+    try {
+      const result = await resendVerificationAction(null, formData);
+
+      if (result && "success" in result && result.success) {
+        setServerSuccess(true);
+        setServerMessage(result.message || "Verification email sent!");
+        setCountdown(60);
+      } else if (result && "error" in result && result.error) {
+        setServerError(result.error);
+      }
+    } catch {
+      setServerError("Something went wrong. Please try again.");
+    } finally {
+      setIsPending(false);
     }
-  }, [state]);
+  };
 
   const showManualEmailInput = !urlEmail;
 
@@ -66,38 +104,42 @@ export function ResendVerificationForm() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        {state && "success" in state && state.success && (
+        {serverSuccess && (
           <div className="flex items-center gap-2 text-green-500 text-sm bg-green-500/10 p-3 rounded-md">
             <CheckCircle className="h-4 w-4" />
-            <span>{state.message}</span>
+            <span>{serverMessage}</span>
           </div>
         )}
 
-        {state && "error" in state && state.error && (
-          <p className="text-sm text-red-500">{state.error}</p>
+        {serverError && (
+          <p className="text-sm text-red-500">{serverError}</p>
         )}
 
-        <form action={formAction} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {showManualEmailInput && (
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-[#fafafa]">
+            <Field>
+              <FieldLabel htmlFor="email" className="text-[#fafafa]">
                 Email
-              </Label>
-              <Input
-                id="email"
+              </FieldLabel>
+              <Controller
                 name="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                required
-                className="border-[#404040] bg-[#262626] text-[#fafafa] placeholder:text-[#737373]"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    id="email"
+                    type="email"
+                    placeholder="you@example.com"
+                    className="border-[#404040] bg-[#262626] text-[#fafafa] placeholder:text-[#737373]"
+                  />
+                )}
               />
-            </div>
+              <FieldError>{errors.email?.message}</FieldError>
+            </Field>
           )}
 
           {!showManualEmailInput && (
-            <input type="hidden" name="email" value={email} />
+            <input type="hidden" {...control.register("email")} value={urlEmail} />
           )}
 
           <Button

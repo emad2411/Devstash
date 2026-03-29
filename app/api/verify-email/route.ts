@@ -1,23 +1,22 @@
 import { verifyToken } from "@/lib/tokens"
+import { verifyEmailTokenSchema } from "@/lib/validations"
 import { NextResponse } from "next/server"
 
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { token } = body
 
-    console.log("[verify-email] Received token:", token ? `${token.slice(0, 10)}...` : "null")
-
-    if (!token || typeof token !== "string") {
+    // Validate token format using Zod
+    const validationResult = verifyEmailTokenSchema.safeParse(body)
+    if (!validationResult.success) {
       return NextResponse.json(
-        { error: "Invalid request" },
+        { error: "Invalid verification token format" },
         { status: 400 }
       )
     }
 
+    const { token } = validationResult.data
     const email = await verifyToken(token)
-
-    console.log("[verify-email] Verification result:", email ? `Success for ${email}` : "Failed - token not found or expired")
 
     if (!email) {
       return NextResponse.json(

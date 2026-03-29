@@ -1,6 +1,8 @@
 "use client";
 
-import { useActionState, useRef } from "react";
+import { useState } from "react";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { loginAction } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,18 +13,55 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Github } from "lucide-react";
+import { Field, FieldLabel, FieldError } from "@/components/ui/field";
+import { GithubIcon } from "@/components/icons/github";
+import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
+import { signInSchema, type SignInInput } from "@/lib/validations";
 
 export function LoginForm() {
-  const [state, formAction, isPending] = useActionState(loginAction, null);
-  const formRef = useRef<HTMLFormElement>(null);
+  const [serverError, setServerError] = useState<string | null>(null);
+  const [isPending, setIsPending] = useState(false);
+  const [isGitHubLoading, setIsGitHubLoading] = useState(false);
+  const [emailNotVerified, setEmailNotVerified] = useState(false);
+  const [submittedEmail, setSubmittedEmail] = useState("");
 
-  const emailValue = formRef.current?.querySelector<HTMLInputElement>(
-    'input[name="email"]'
-  )?.value;
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<SignInInput>({
+    resolver: zodResolver(signInSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const onSubmit = async (data: SignInInput) => {
+    setIsPending(true);
+    setServerError(null);
+    setEmailNotVerified(false);
+    setSubmittedEmail(data.email);
+
+    const formData = new FormData();
+    formData.append("email", data.email);
+    formData.append("password", data.password);
+
+    // Note: loginAction redirects on success, which throws NEXT_REDIRECT
+    // This is expected behavior - we only handle actual errors returned by the action
+    const result = await loginAction(null, formData);
+
+    if (result?.error) {
+      setServerError(result.error);
+      if (result.code === "EMAIL_NOT_VERIFIED") {
+        setEmailNotVerified(true);
+      }
+      setIsPending(false);
+    }
+    // On success, the action redirects to /dashboard
+  };
 
   return (
     <Card className="border-[#262626] bg-[#1a1a1a]">
@@ -35,45 +74,53 @@ export function LoginForm() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <form ref={formRef} action={formAction} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email" className="text-[#fafafa]">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <Field>
+            <FieldLabel htmlFor="email" className="text-[#fafafa]">
               Email
-            </Label>
-            <Input
-              id="email"
+            </FieldLabel>
+            <Controller
               name="email"
-              type="email"
-              placeholder="you@example.com"
-              required
-              className="border-[#404040] bg-[#262626] text-[#fafafa] placeholder:text-[#737373]"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  id="email"
+                  type="email"
+                  placeholder="you@example.com"
+                  className="border-[#404040] bg-[#262626] text-[#fafafa] placeholder:text-[#737373]"
+                />
+              )}
             />
-            {state?.errors?.email && (
-              <p className="text-sm text-red-500">{state.errors.email[0]}</p>
-            )}
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="password" className="text-[#fafafa]">
+            <FieldError>{errors.email?.message}</FieldError>
+          </Field>
+
+          <Field>
+            <FieldLabel htmlFor="password" className="text-[#fafafa]">
               Password
-            </Label>
-            <Input
-              id="password"
+            </FieldLabel>
+            <Controller
               name="password"
-              type="password"
-              placeholder="••••••••"
-              required
-              className="border-[#404040] bg-[#262626] text-[#fafafa] placeholder:text-[#737373]"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  id="password"
+                  type="password"
+                  placeholder="••••••••"
+                  className="border-[#404040] bg-[#262626] text-[#fafafa] placeholder:text-[#737373]"
+                />
+              )}
             />
-            {state?.errors?.password && (
-              <p className="text-sm text-red-500">{state.errors.password[0]}</p>
-            )}
-          </div>
-          {state?.error && (
+            <FieldError>{errors.password?.message}</FieldError>
+          </Field>
+
+          {serverError && (
             <div className="space-y-2">
-              <p className="text-sm text-red-500">{state.error}</p>
-              {state?.code === "EMAIL_NOT_VERIFIED" && emailValue && (
+              <p className="text-sm text-red-500">{serverError}</p>
+              {emailNotVerified && submittedEmail && (
                 <Link
-                  href={`/verify-email?email=${encodeURIComponent(emailValue)}`}
+                  href={`/verify-email?email=${encodeURIComponent(submittedEmail)}`}
                   className="text-sm text-[#3b82f6] hover:text-[#2563eb] hover:underline inline-block"
                 >
                   Resend verification email
@@ -81,6 +128,7 @@ export function LoginForm() {
               )}
             </div>
           )}
+
           <Button
             type="submit"
             disabled={isPending}
@@ -103,11 +151,24 @@ export function LoginForm() {
 
         <Button
           variant="outline"
-          onClick={() => signIn("github", { callbackUrl: "/dashboard" })}
+          onClick={() => {
+            setIsGitHubLoading(true);
+            signIn("github", { callbackUrl: "/dashboard" });
+          }}
+          disabled={isGitHubLoading}
           className="w-full border-[#404040] bg-[#262626] text-[#fafafa] hover:bg-[#404040]"
         >
-          <Github className="mr-2 h-4 w-4" />
-          GitHub
+          {isGitHubLoading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Connecting...
+            </>
+          ) : (
+            <>
+              <GithubIcon className="mr-2 h-4 w-4" />
+              GitHub
+            </>
+          )}
         </Button>
 
         <p className="text-center text-sm text-[#a3a3a3]">

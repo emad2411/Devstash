@@ -23,20 +23,15 @@ export function VerifyEmailHandler({ token }: VerifyEmailHandlerProps) {
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
-    console.log("[client] Token received:", token ? `${token.slice(0, 20)}... (${token.length} chars)` : "null");
-
     async function verifyEmail() {
       try {
-        console.log("[client] POSTing to /api/verify-email");
         const response = await fetch("/api/verify-email", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ token }),
         });
 
-        console.log("[client] Response status:", response.status);
         const data = await response.json();
-        console.log("[client] Response data:", data);
 
         if (response.ok && data.success) {
           setStatus("success");

@@ -22,3 +22,17 @@ export const signUpSchema = z
 
 export type SignInInput = z.infer<typeof signInSchema>
 export type SignUpInput = z.infer<typeof signUpSchema>
+
+export const resendVerificationSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+})
+
+export const verifyEmailTokenSchema = z.object({
+  token: z
+    .string()
+    .length(96, "Invalid verification token")
+    .regex(/^[a-f0-9]+$/, "Invalid verification token format"),
+})
+
+export type ResendVerificationInput = z.infer<typeof resendVerificationSchema>
+export type VerifyEmailTokenInput = z.infer<typeof verifyEmailTokenSchema>
