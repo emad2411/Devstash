@@ -2,9 +2,9 @@
 
 import { signIn, signOut } from "@/auth"
 import { prisma } from "@/lib/prisma"
-import { signInSchema, signUpSchema } from "@/lib/validations"
-import { generateVerificationToken, canResendToken } from "@/lib/tokens"
-import { sendVerificationEmail } from "@/lib/email"
+import { signInSchema, signUpSchema, forgotPasswordSchema, resetPasswordSchema } from "@/lib/validations"
+import { generateVerificationToken, canResendToken, generatePasswordResetToken, verifyPasswordResetToken, canResendResetToken } from "@/lib/tokens"
+import { sendVerificationEmail, sendPasswordResetEmail } from "@/lib/email"
 import bcrypt from "bcryptjs"
 import { AuthError } from "next-auth"
 import { redirect } from "next/navigation"
@@ -34,7 +34,23 @@ export async function loginAction(prevState: unknown, formData: FormData) {
     if (error instanceof AuthError) {
       // Check for specific error message from authorize callback
       if (error.message === "EMAIL_NOT_VERIFIED") {
-        return { error: "Please verify your email before signing in", code: "EMAIL_NOT_VERIFIED" }
+        // Auto-resend verification email (respect cooldown)
+        const allowed = await canResendToken(email)
+        let emailSent = false
+
+        if (allowed) {
+          const token = await generateVerificationToken(email)
+          await sendVerificationEmail(email, token)
+          emailSent = true
+        }
+
+        return {
+          error: emailSent
+            ? "Your email is not verified. We've sent a new verification link — check your inbox."
+            : "Your email is not verified. A verification email was recently sent — please check your inbox.",
+          code: "EMAIL_NOT_VERIFIED",
+          emailSent,
+        }
       }
       return { error: "Invalid email or password" }
     }
@@ -119,6 +135,61 @@ export async function resendVerificationAction(
   } catch {
     return genericResponse
   }
+}
+
+/** Forgot password — sends a reset email (generic response to prevent enumeration). */
+export async function forgotPasswordAction(prevState: unknown, formData: FormData) {
+  const validated = forgotPasswordSchema.safeParse({ email: formData.get("email") })
+  if (!validated.success) return { error: "Please enter a valid email" }
+
+  const { email } = validated.data
+  const genericResponse = { success: true, message: "If an account exists, we sent a reset link" }
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: { email },
+      select: { password: true },
+    })
+
+    // Only allow reset for credential users (who have a password)
+    if (!user || !user.password) return genericResponse
+
+    const allowed = await canResendResetToken(email)
+    if (!allowed) return { error: "Please wait before requesting another email." }
+
+    const token = await generatePasswordResetToken(email)
+    await sendPasswordResetEmail(email, token)
+
+    return genericResponse
+  } catch {
+    return genericResponse
+  }
+}
+
+/** Reset password — verifies token and updates the password. */
+export async function resetPasswordAction(prevState: unknown, formData: FormData) {
+  const token = formData.get("token") as string
+  const validated = resetPasswordSchema.safeParse({
+    password: formData.get("password"),
+    confirmPassword: formData.get("confirmPassword"),
+  })
+
+  if (!validated.success) {
+    return { error: "Invalid form data", errors: validated.error.flatten().fieldErrors }
+  }
+
+  if (!token) return { error: "Missing reset token" }
+
+  const email = await verifyPasswordResetToken(token)
+  if (!email) return { error: "Token is invalid or has expired" }
+
+  const hashedPassword = await bcrypt.hash(validated.data.password, 10)
+  await prisma.user.update({
+    where: { email },
+    data: { password: hashedPassword },
+  })
+
+  return { success: true }
 }
 
 export async function logoutAction() {

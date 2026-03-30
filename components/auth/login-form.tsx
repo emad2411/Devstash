@@ -15,7 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Field, FieldLabel, FieldError } from "@/components/ui/field";
 import { GithubIcon } from "@/components/icons/github";
-import { Loader2 } from "lucide-react";
+import { Loader2, Mail } from "lucide-react";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { signInSchema, type SignInInput } from "@/lib/validations";
@@ -115,19 +115,25 @@ export function LoginForm() {
             <FieldError>{errors.password?.message}</FieldError>
           </Field>
 
-          {serverError && (
-            <div className="space-y-2">
-              <p className="text-sm text-red-500">{serverError}</p>
-              {emailNotVerified && submittedEmail && (
-                <Link
-                  href={`/verify-email?email=${encodeURIComponent(submittedEmail)}`}
-                  className="text-sm text-[#3b82f6] hover:text-[#2563eb] hover:underline inline-block"
-                >
-                  Resend verification email
-                </Link>
-              )}
+          {serverError && !emailNotVerified && (
+            <p className="text-sm text-red-500">{serverError}</p>
+          )}
+
+          {emailNotVerified && (
+            <div className="flex items-center gap-2 text-sm bg-blue-500/10 border border-blue-500/20 p-3 rounded-md">
+              <Mail className="h-4 w-4 text-blue-400 shrink-0" />
+              <span className="text-blue-300">{serverError}</span>
             </div>
           )}
+
+          <div className="flex justify-end">
+            <Link
+              href="/forgot-password"
+              className="text-sm text-[#a3a3a3] hover:text-[#3b82f6] hover:underline"
+            >
+              Forgot password?
+            </Link>
+          </div>
 
           <Button
             type="submit"
