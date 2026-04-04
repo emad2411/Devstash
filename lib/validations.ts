@@ -55,3 +55,29 @@ export type ResendVerificationInput = z.infer<typeof resendVerificationSchema>
 export type VerifyEmailTokenInput = z.infer<typeof verifyEmailTokenSchema>
 export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>
 export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>
+
+export const updateProfileSchema = z.object({
+  name: z.string().min(1, "Name is required").max(50, "Name must be less than 50 characters").optional(),
+})
+
+export const changePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(8, "Password must be at least 8 characters"),
+    newPassword: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .max(128, "Password must be less than 128 characters"),
+    confirmNewPassword: z.string(),
+  })
+  .refine((data) => data.newPassword === data.confirmNewPassword, {
+    message: "Passwords do not match",
+    path: ["confirmNewPassword"],
+  })
+
+export const deleteAccountSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+})
+
+export type UpdateProfileInput = z.infer<typeof updateProfileSchema>
+export type ChangePasswordInput = z.infer<typeof changePasswordSchema>
+export type DeleteAccountInput = z.infer<typeof deleteAccountSchema>

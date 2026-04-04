@@ -1,6 +1,7 @@
 'use client';
 
 import { ChevronRight, Folder, LogOut, Settings, User } from 'lucide-react';
+import Link from 'next/link';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -270,7 +271,10 @@ export function Sidebar({
                 </Button>
               </div>
               <DropdownMenuContent align="start" className="w-48">
-                <DropdownMenuItem className="cursor-pointer">
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  render={<Link href="/profile" />}
+                >
                   <User className="mr-2 h-4 w-4" />
                   Profile
                 </DropdownMenuItem>
@@ -312,7 +316,10 @@ export function Sidebar({
                   </TooltipContent>
                 </Tooltip>
                 <DropdownMenuContent align="start" className="w-48">
-                  <DropdownMenuItem className="cursor-pointer">
+                  <DropdownMenuItem
+                    className="cursor-pointer"
+                    render={<Link href="/profile" />}
+                  >
                     <User className="mr-2 h-4 w-4" />
                     Profile
                   </DropdownMenuItem>

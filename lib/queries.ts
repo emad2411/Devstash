@@ -255,3 +255,85 @@ export async function getDashboardStats(userId: string) {
     pinned,
   };
 }
+
+/** Fetch profile data (user info with hasPasswordAccount) */
+export async function getProfileData(userId: string) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      image: true,
+      isPro: true,
+      createdAt: true,
+      password: true,
+      accounts: {
+        select: {
+          provider: true,
+        },
+      },
+    },
+  });
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    image: user.image,
+    isPro: user.isPro,
+    createdAt: user.createdAt,
+    hasPasswordAccount: !!user.password,
+    oauthProviders: user.accounts.map((a) => a.provider),
+  };
+}
+
+/** Fetch profile stats (total items, collections, item type breakdown) */
+export async function getProfileStats(userId: string) {
+  const [totalItems, totalCollections, itemsByType] = await Promise.all([
+    prisma.item.count({
+      where: { userId },
+    }),
+    prisma.collection.count({
+      where: { userId },
+    }),
+    prisma.item.groupBy({
+      by: ["itemTypeId"],
+      where: { userId },
+      _count: {
+        itemTypeId: true,
+      },
+    }),
+  ]);
+
+  // Get item type names for the breakdown
+  const itemTypeIds = itemsByType.map((item) => item.itemTypeId);
+  const itemTypes = await prisma.itemType.findMany({
+    where: {
+      id: { in: itemTypeIds },
+    },
+    select: {
+      id: true,
+      name: true,
+      icon: true,
+      color: true,
+    },
+  });
+
+  const itemTypeMap = new Map(itemTypes.map((t) => [t.id, t]));
+
+  const itemTypeBreakdown = itemsByType.map((item) => ({
+    ...itemTypeMap.get(item.itemTypeId)!,
+    count: item._count.itemTypeId,
+  }));
+
+  return {
+    totalItems,
+    totalCollections,
+    itemTypeBreakdown,
+  };
+}

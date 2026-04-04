@@ -15,9 +15,10 @@ export const authConfig = {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user
       const isOnDashboard = nextUrl.pathname.startsWith("/dashboard")
+      const isOnProfile = nextUrl.pathname.startsWith("/profile")
       const isOnApi = nextUrl.pathname.startsWith("/api") && !nextUrl.pathname.startsWith("/api/auth")
 
-      if (isOnDashboard || isOnApi) {
+      if (isOnDashboard || isOnProfile || isOnApi) {
         if (isLoggedIn) return true
         return false // Redirect to login
       }

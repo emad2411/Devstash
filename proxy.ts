@@ -10,11 +10,12 @@ export default proxy((req) => {
 
   // Protected routes
   const isOnDashboard = nextUrl.pathname.startsWith("/dashboard")
+  const isOnProfile = nextUrl.pathname.startsWith("/profile")
   const isOnApi = nextUrl.pathname.startsWith("/api") &&
     !nextUrl.pathname.startsWith("/api/auth") &&
     !nextUrl.pathname.startsWith("/api/verify-email")
 
-  if ((isOnDashboard || isOnApi) && !isLoggedIn) {
+  if ((isOnDashboard || isOnProfile || isOnApi) && !isLoggedIn) {
     const callbackUrl = encodeURIComponent(nextUrl.pathname + nextUrl.search)
     const newUrl = new URL(`/login?callbackUrl=${callbackUrl}`, nextUrl.origin)
     return Response.redirect(newUrl)
