@@ -1,56 +1,16 @@
 # Current Feature
 
-## Phase 6: Forgot Password & Fixes
-
 ## Status
-Complete
+
+Not Started
 
 ## Goals
 
-- [ ] Fix email sender for production (use `EMAIL_FROM` env var with fallback to `onboarding@resend.dev`)
-- [ ] Auto-resend verification emails on login with expired/unverified tokens (with cooldown)
-- [ ] Implement complete forgot/reset password flow:
-  - [ ] Forgot password page with email form
-  - [ ] Reset password page with token validation
-  - [ ] Server actions for generating/verifying reset tokens
-  - [ ] Email template for password reset
-  - [ ] Resend cooldown (60s) for reset emails
-  - [ ] Generic responses to prevent user enumeration
-  - [ ] Security: Only credential-based users can reset passwords (OAuth users excluded)
+<!-- Add your feature goals here -->
 
 ## Notes
 
-**Token Strategy**: Reuse existing `VerificationToken` model with `reset:` prefix on identifier (e.g., `reset:user@example.com`). No database migration needed.
-
-**Security Features**:
-- Same CSPRNG + SHA-256 hashing as email verification
-- Same 1-hour expiry
-- Same 60-second resend cooldown
-- Token consumed (deleted) after successful use
-- Generic "If an account exists, we sent an email" response (no user enumeration)
-
-**Email Sender Fix**:
-- Replace hardcoded env check with `EMAIL_FROM` env var
-- Fallback to `onboarding@resend.dev` for now
-- Works in both dev and production until custom domain is verified
-
-**Auto-Resend on Login**:
-- When `EMAIL_NOT_VERIFIED` error occurs, automatically resend verification email
-- Show blue info banner instead of red error + manual resend link
-- Respect 60s cooldown between resends
-
-**Files to Create**:
-- `components/auth/forgot-password-form.tsx` - RHF + Zod validation
-- `components/auth/reset-password-form.tsx` - RHF + Zod validation
-- `app/(auth)/forgot-password/page.tsx` - Server component
-- `app/(auth)/reset-password/page.tsx` - Server component with token validation
-
-**Files to Modify**:
-- `lib/email.ts` - Add `sendPasswordResetEmail`, fix `FROM_ADDRESS`
-- `lib/tokens.ts` - Add reset token functions, clean up console.logs
-- `lib/validations.ts` - Add `forgotPasswordSchema`, `resetPasswordSchema`
-- `actions/auth.ts` - Add `forgotPasswordAction`, `resetPasswordAction`, auto-resend in `loginAction`
-- `components/auth/login-form.tsx` - Blue verification banner, "Forgot password?" link
+<!-- Add any additional notes or constraints -->
 
 ## History
 
@@ -72,3 +32,5 @@ Complete
 - **Sidebar Avatar Dropdown (2026-03-28)**: Added dropdown menu to sidebar avatar with Profile and Sign Out options
 - **Phase 5: Email Verification (2026-03-29)**: Secure email verification with Resend API, SHA-256 token hashing, 60-second resend rate limit, GitHub auto-verification
 - **Auth Form Validation (2026-03-29)**: React Hook Form + Zod validation, custom GithubIcon, loading states
+- **Phase 6: Forgot Password & Fixes (2026-03-30)**: Email sender fix (EMAIL_FROM env var), auto-resend verification on login, complete forgot/reset password flow with token-based reset
+- **Profile Page (2026-04-04)**: Standalone /profile route with user info, usage stats, change password form (email users only), delete account dialog with email confirmation, back to dashboard link
