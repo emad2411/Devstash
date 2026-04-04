@@ -1,16 +1,47 @@
-# Current Feature
+# Rate Limiting for Auth
 
 ## Status
 
-Not Started
+In Progress
 
 ## Goals
 
-<!-- Add your feature goals here -->
+- [x] Install Upstash dependencies: `@upstash/ratelimit` and `@upstash/redis`
+- [x] Create `lib/rate-limit.ts` utility with pre-configured rate limiters for all auth actions
+n- [x] Add IP extraction helper using `next/headers`
+- [x] Integrate rate limiting into `actions/auth.ts` (login, register, forgotPassword, resetPassword, resendVerification)
+- [x] Integrate rate limiting into `actions/profile.ts` (changePassword, deleteAccount)
+- [x] Add rate limiting to `POST /api/verify-email` API route with 429 response
+- [x] Verify fail-open behavior when Upstash env vars are missing
+- [x] Test rate limiting on each endpoint and verify error messages
 
 ## Notes
 
-<!-- Add any additional notes or constraints -->
+- Uses Upstash Redis with `@upstash/ratelimit` for serverless-compatible rate limiting
+- Free tier: 10k commands/day — sufficient for auth rate limiting
+- Fail open: if Upstash is unavailable, allow the request (don't break auth)
+- Existing DB-based `canResendToken` cooldowns remain as defense-in-depth
+- Sliding window algorithm for smooth limiting
+
+### Rate Limit Configuration
+
+| Action | Limit | Window | Key By |
+|--------|-------|--------|--------|
+| login | 5 | 15 min | IP + email |
+| register | 3 | 1 hour | IP |
+| forgotPassword | 3 | 1 hour | IP |
+| resetPassword | 5 | 15 min | IP |
+| resendVerification | 3 | 15 min | IP + email |
+| verifyEmail (API) | 5 | 15 min | IP |
+| changePassword | 5 | 15 min | User ID |
+| deleteAccount | 3 | 1 hour | User ID |
+
+### Required Env Variables
+
+```env
+UPSTASH_REDIS_REST_URL=
+UPSTASH_REDIS_REST_TOKEN=
+```
 
 ## History
 

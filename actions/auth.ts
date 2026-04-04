@@ -5,11 +5,20 @@ import { prisma } from "@/lib/prisma"
 import { signInSchema, signUpSchema, forgotPasswordSchema, resetPasswordSchema } from "@/lib/validations"
 import { generateVerificationToken, canResendToken, generatePasswordResetToken, verifyPasswordResetToken, canResendResetToken } from "@/lib/tokens"
 import { sendVerificationEmail, sendPasswordResetEmail } from "@/lib/email"
+import { rateLimiters, checkRateLimit, formatRetryAfter, getClientIp } from "@/lib/rate-limit"
 import bcrypt from "bcryptjs"
 import { AuthError } from "next-auth"
 import { redirect } from "next/navigation"
 
 export async function loginAction(prevState: unknown, formData: FormData) {
+  // --- Rate limit check (before any validation or DB call) ---
+  const ip = await getClientIp()
+  const emailInput = (formData.get("email") as string) || "unknown"
+  const rl = await checkRateLimit(rateLimiters.login, `${ip}:${emailInput}`)
+  if (!rl.success) {
+    return { error: formatRetryAfter(rl.reset) }
+  }
+
   const validatedFields = signInSchema.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
@@ -61,6 +70,13 @@ export async function loginAction(prevState: unknown, formData: FormData) {
 }
 
 export async function registerAction(prevState: unknown, formData: FormData) {
+  // --- Rate limit check (before any validation or DB call) ---
+  const ip = await getClientIp()
+  const rl = await checkRateLimit(rateLimiters.register, ip)
+  if (!rl.success) {
+    return { error: formatRetryAfter(rl.reset) }
+  }
+
   const validatedFields = signUpSchema.safeParse({
     name: formData.get("name"),
     email: formData.get("email"),
@@ -110,8 +126,15 @@ export async function resendVerificationAction(
   prevState: unknown,
   formData: FormData
 ) {
-  const email = formData.get("email") as string
-  if (!email) return { error: "Email is required" }
+  // --- Rate limit check (before any validation or DB call) ---
+  const ip = await getClientIp()
+  const email = (formData.get("email") as string) || "unknown"
+  const rl = await checkRateLimit(rateLimiters.resendVerification, `${ip}:${email}`)
+  if (!rl.success) {
+    return { error: formatRetryAfter(rl.reset) }
+  }
+
+  if (!email || email === "unknown") return { error: "Email is required" }
 
   const genericResponse = { success: true, message: "If an account exists, we sent a verification email" }
 
@@ -139,6 +162,13 @@ export async function resendVerificationAction(
 
 /** Forgot password — sends a reset email (generic response to prevent enumeration). */
 export async function forgotPasswordAction(prevState: unknown, formData: FormData) {
+  // --- Rate limit check (before any validation or DB call) ---
+  const ip = await getClientIp()
+  const rl = await checkRateLimit(rateLimiters.forgotPassword, ip)
+  if (!rl.success) {
+    return { error: formatRetryAfter(rl.reset) }
+  }
+
   const validated = forgotPasswordSchema.safeParse({ email: formData.get("email") })
   if (!validated.success) return { error: "Please enter a valid email" }
 
@@ -168,6 +198,13 @@ export async function forgotPasswordAction(prevState: unknown, formData: FormDat
 
 /** Reset password — verifies token and updates the password. */
 export async function resetPasswordAction(prevState: unknown, formData: FormData) {
+  // --- Rate limit check (before any validation or DB call) ---
+  const ip = await getClientIp()
+  const rl = await checkRateLimit(rateLimiters.resetPassword, ip)
+  if (!rl.success) {
+    return { error: formatRetryAfter(rl.reset) }
+  }
+
   const token = formData.get("token") as string
   const validated = resetPasswordSchema.safeParse({
     password: formData.get("password"),

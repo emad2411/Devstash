@@ -1,8 +1,25 @@
 import { verifyToken } from "@/lib/tokens"
 import { verifyEmailTokenSchema } from "@/lib/validations"
+import { rateLimiters, checkRateLimit, formatRetryAfter } from "@/lib/rate-limit"
 import { NextResponse } from "next/server"
 
 export async function POST(request: Request) {
+  // --- Rate limit check ---
+  const forwarded = request.headers.get("x-forwarded-for")
+  const ip = forwarded?.split(",")[0]?.trim() || "unknown"
+  const rl = await checkRateLimit(rateLimiters.verifyEmail, ip)
+  if (!rl.success) {
+    return NextResponse.json(
+      { error: formatRetryAfter(rl.reset) },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": String(Math.ceil((rl.reset - Date.now()) / 1000)),
+        },
+      }
+    )
+  }
+
   try {
     const body = await request.json()
 

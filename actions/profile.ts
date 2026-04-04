@@ -7,6 +7,7 @@ import {
   changePasswordSchema,
   deleteAccountSchema,
 } from "@/lib/validations";
+import { rateLimiters, checkRateLimit, formatRetryAfter } from "@/lib/rate-limit";
 import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -108,6 +109,12 @@ export async function changePasswordAction(
     return { error: "Unauthorized" };
   }
 
+  // --- Rate limit check (before any validation or DB call) ---
+  const rl = await checkRateLimit(rateLimiters.changePassword, session.user.id)
+  if (!rl.success) {
+    return { error: formatRetryAfter(rl.reset) }
+  }
+
   const validatedFields = changePasswordSchema.safeParse({
     currentPassword: formData.get("currentPassword"),
     newPassword: formData.get("newPassword"),
@@ -161,6 +168,12 @@ export async function deleteAccountAction(
   const session = await auth();
   if (!session?.user?.id || !session?.user?.email) {
     return { error: "Unauthorized" };
+  }
+
+  // --- Rate limit check (before any validation or DB call) ---
+  const rl = await checkRateLimit(rateLimiters.deleteAccount, session.user.id)
+  if (!rl.success) {
+    return { error: formatRetryAfter(rl.reset) }
   }
 
   const validatedFields = deleteAccountSchema.safeParse({
