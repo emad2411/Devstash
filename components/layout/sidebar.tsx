@@ -40,6 +40,7 @@ interface NavItemData {
   icon: string;
   color: string;
   itemCount: number;
+  href: string;
 }
 
 function NavItem({
@@ -56,7 +57,8 @@ function NavItem({
   const isPro = item.label.toLowerCase() === 'file' || item.label.toLowerCase() === 'image';
 
   const content = (
-    <button
+    <Link
+      href={item.href}
       onClick={onClick}
       className={cn(
         'group relative flex w-full items-center gap-3 rounded-lg px-3 py-2.5 transition-colors',
@@ -91,7 +93,7 @@ function NavItem({
           </span>
         </div>
       )}
-    </button>
+    </Link>
   );
 
   if (!isOpen) {
@@ -164,13 +166,14 @@ export function Sidebar({
   // "All Items" is prepended as a static entry
   const totalCount = navItems.reduce((sum, item) => sum + item.itemCount, 0);
   const allNavItems: NavItemData[] = [
-    { id: 'all', label: 'All Items', icon: 'Grid3X3', color: '#6b7280', itemCount: totalCount },
+    { id: 'all', label: 'All Items', icon: 'Grid3X3', color: '#6b7280', itemCount: totalCount, href: '/dashboard' },
     ...navItems.map((item) => ({
       id: item.id,
       label: item.name,
       icon: item.icon,
       color: item.color,
       itemCount: item.itemCount,
+      href: `/dashboard/items/${item.name.toLowerCase()}`,
     })),
   ];
   return (

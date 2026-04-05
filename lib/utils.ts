@@ -14,3 +14,8 @@ export function getInitials(name?: string | null) {
   const last = parts[parts.length - 1][0]
   return (first + last).toUpperCase()
 }
+
+export function capitalize(str: string): string {
+  if (!str) return ''
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
+}

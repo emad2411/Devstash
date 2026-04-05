@@ -337,3 +337,59 @@ export async function getProfileStats(userId: string) {
     itemTypeBreakdown,
   };
 }
+
+/** Fetch items by type name for a user, including tags and itemType data */
+export async function getItemsByType(userId: string, typeName: string) {
+  const items = await prisma.item.findMany({
+    where: {
+      userId,
+      itemType: {
+        name: typeName,
+      },
+    },
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      content: true,
+      url: true,
+      isFavorite: true,
+      isPinned: true,
+      language: true,
+      itemTypeId: true,
+      updatedAt: true,
+      tags: {
+        select: {
+          tag: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      },
+      itemType: {
+        select: {
+          name: true,
+          icon: true,
+          color: true,
+        },
+      },
+    },
+    orderBy: { updatedAt: "desc" },
+  });
+
+  return items.map((item) => ({
+    id: item.id,
+    title: item.title,
+    description: item.description,
+    content: item.content,
+    url: item.url,
+    isFavorite: item.isFavorite,
+    isPinned: item.isPinned,
+    language: item.language,
+    itemTypeId: item.itemTypeId,
+    updatedAt: item.updatedAt.toISOString(),
+    tags: item.tags.map((t) => ({ name: t.tag.name })),
+    itemType: item.itemType,
+  }));
+}

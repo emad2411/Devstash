@@ -428,10 +428,10 @@ model ItemTag {
 
 ### Phase 1: Foundation (Week 1-2)
 - [x] Project setup (Next.js 16, TypeScript, Tailwind v4)
-- [ ] Database setup (Neon + Prisma)
-- [ ] Authentication (Next-Auth v5)
-- [ ] Basic layout (Sidebar + Main)
-- [ ] System ItemTypes seeding
+- [x] Database setup (Neon + Prisma)
+- [x] Authentication (Next-Auth v5)
+- [x] Basic layout (Sidebar + Main)
+- [x] System ItemTypes seeding
 
 ### Phase 2: Core CRUD (Week 3-4)
 - [ ] Item creation (text types: snippet, prompt, note, command, link)

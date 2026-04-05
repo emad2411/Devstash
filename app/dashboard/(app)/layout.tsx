@@ -1,22 +1,16 @@
 import { connection } from "next/server";
-
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
-import { PinnedCollections } from "@/components/dashboard/pinned-collections";
-import { RecentItems } from "@/components/dashboard/recent-items";
-import { WelcomeHeader } from "@/components/dashboard/welcome-header";
-import {
-  getCollections,
-  getDashboardStats,
-  getItemTypes,
-  getPinnedCollections,
-  getRecentItems,
-} from "@/lib/queries";
+import { getItemTypes, getCollections } from "@/lib/queries";
 import { requireAuth } from "@/lib/auth-utils";
 import { prisma } from "@/lib/prisma";
 import { SidebarCollection } from "@/types/layout";
 
-export default async function DashboardPage() {
-  await connection(); // Next.js 16: opt into dynamic rendering
+export default async function AppLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  await connection();
   const sessionUser = await requireAuth();
 
   const user = await prisma.user.findUnique({
@@ -33,14 +27,11 @@ export default async function DashboardPage() {
   if (!user) {
     throw new Error('Authenticated user not found in database');
   }
-  const [itemTypesRaw, collections, recentItems, pinnedCollections, stats] =
-    await Promise.all([
-      getItemTypes(user.id),
-      getCollections(user.id),
-      getRecentItems(user.id),
-      getPinnedCollections(user.id),
-      getDashboardStats(user.id),
-    ]);
+
+  const [itemTypesRaw, collections] = await Promise.all([
+    getItemTypes(user.id),
+    getCollections(user.id),
+  ]);
 
   // Sort itemTypes so "File" and "Image" appear at the end (Pro features)
   const itemTypes = [...itemTypesRaw].sort((a, b) => {
@@ -65,14 +56,7 @@ export default async function DashboardPage() {
       navItems={itemTypes}
       user={user}
     >
-      <div className="mx-auto max-w-7xl">
-        <WelcomeHeader
-          userName={user.name ?? "Developer"}
-          totalItems={stats.totalItems}
-        />
-        <PinnedCollections collections={pinnedCollections} />
-        <RecentItems items={recentItems} />
-      </div>
+      {children}
     </DashboardLayout>
   );
 }
