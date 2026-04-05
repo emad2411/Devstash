@@ -1,26 +1,16 @@
-# Build Item Listing by Type Page (`/items/[type]`)
+# Current Feature
 
 ## Status
 
-Complete
+Not Started
 
 ## Goals
 
-- [x] Add `getItemsByType(userId, typeName)` query helper in `lib/queries.ts`
-- [x] Create `ItemsGrid` client component with grid/list toggle at `components/items/items-grid.tsx`
-- [x] Build server component page at `app/dashboard/items/[type]/page.tsx`
-- [x] Add loading skeleton at `app/dashboard/items/[type]/loading.tsx`
-- [x] Verify routes work: `/dashboard/items/snippet`, `/dashboard/items/prompt`, etc.
-- [x] Validate empty state displays correctly for unused types
+<!-- Add your feature goals here -->
 
 ## Notes
 
-- Query items by `itemType.name` for the authenticated user
-- Include tags and itemType data in the returned payload
-- Reuse existing `ItemCard` component from `@/components/dashboard/item-card`
-- Grid/list toggle similar to RecentItems on dashboard
-- Use shadcn/ui Card and Skeleton components for loading state
-- Invalid types return 404 via `notFound()`
+<!-- Add any additional notes or constraints -->
 
 ## History
 
@@ -45,4 +35,4 @@ Complete
 - **Phase 6: Forgot Password & Fixes (2026-03-30)**: Email sender fix (EMAIL_FROM env var), auto-resend verification on login, complete forgot/reset password flow with token-based reset
 - **Profile Page (2026-04-04)**: Standalone /profile route with user info, usage stats, change password form (email users only), delete account dialog with email confirmation, back to dashboard link
 - **Rate Limiting for Auth (2026-04-04)**: Upstash Redis rate limiting on all auth endpoints with fail-open behavior, sliding window algorithm, human-readable retry messages
-- **Item Listing by Type Page (2026-04-05)**: Dynamic `/dashboard/items/[type]` routes with grid/list toggle, empty states, loading skeletons, and 404 handling for invalid types
+- **Item Listing by Type Page (2026-04-05)**: Dynamic `/dashboard/items/[type]` routes with grid/list toggle, empty states, loading skeletons, sidebar navigation links, and persistent layout via route groups
