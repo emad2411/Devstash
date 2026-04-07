@@ -1,24 +1,16 @@
-# Item Creation Flow
+# Current Feature
 
 ## Status
 
-Complete
+Not Started
 
 ## Goals
 
-- Implement item creation for text-based types (snippets, prompts, notes, commands, links)
-- Add `createItemSchema` in `lib/validations.ts`
-- Create `createItemAction` in `actions/items.ts` with session check and tag upserting
-- Implement `ItemForm` component in `components/items/item-form.tsx` using `useActionState` and `react-hook-form`
-- Add "New Item" trigger button to `components/layout/sidebar.tsx`
-- Ensure validation for conditionally required fields (e.g., `url` for links)
+<!-- Feature goals go here -->
 
 ## Notes
 
-- Strictly follow `useActionState` and Zod pattern established in `actions/auth.ts`
-- Form should automatically adjust fields based on selected `ItemType`
-- Use `revalidatePath` for UI refresh after success
-- **Form Placement Decision Needed:** Step 3 of Phase 2 is building an "Item Drawer." Should we implement the `ItemForm` directly into a new Drawer/Modal right now so the user can trigger it from anywhere, or would you prefer a dedicated page (`/dashboard/items/new`) for this Step 1?
+<!-- Additional notes go here -->
 
 ## History
 
