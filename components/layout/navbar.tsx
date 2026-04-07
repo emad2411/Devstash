@@ -14,6 +14,7 @@ import {
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { ItemForm } from '@/components/items/item-form';
 
 interface NavbarProps {
   onSidebarToggle?: () => void;
@@ -23,6 +24,7 @@ interface NavbarProps {
 export function Navbar({ onSidebarToggle, isSidebarOpen = false }: NavbarProps) {
   const [isDark, setIsDark] = useState(false);
   const [notificationCount] = useState(3);
+  const [isItemFormOpen, setIsItemFormOpen] = useState(false);
 
   const toggleTheme = () => {
     setIsDark(!isDark);
@@ -114,12 +116,19 @@ export function Navbar({ onSidebarToggle, isSidebarOpen = false }: NavbarProps) 
           </Button>
 
           {/* New Item button */}
-          <Button size="sm" className="gap-1.5">
+          <Button
+            size="sm"
+            className="gap-1.5"
+            onClick={() => setIsItemFormOpen(true)}
+          >
             <Plus className="size-4" />
             <span>New Item</span>
           </Button>
         </div>
       </div>
+
+      {/* Item Creation Modal */}
+      <ItemForm open={isItemFormOpen} onOpenChange={setIsItemFormOpen} />
     </header>
   );
 }

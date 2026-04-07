@@ -1,16 +1,24 @@
-# Current Feature
+# Item Creation Flow
 
 ## Status
 
-Not Started
+Complete
 
 ## Goals
 
-<!-- Add your feature goals here -->
+- Implement item creation for text-based types (snippets, prompts, notes, commands, links)
+- Add `createItemSchema` in `lib/validations.ts`
+- Create `createItemAction` in `actions/items.ts` with session check and tag upserting
+- Implement `ItemForm` component in `components/items/item-form.tsx` using `useActionState` and `react-hook-form`
+- Add "New Item" trigger button to `components/layout/sidebar.tsx`
+- Ensure validation for conditionally required fields (e.g., `url` for links)
 
 ## Notes
 
-<!-- Add any additional notes or constraints -->
+- Strictly follow `useActionState` and Zod pattern established in `actions/auth.ts`
+- Form should automatically adjust fields based on selected `ItemType`
+- Use `revalidatePath` for UI refresh after success
+- **Form Placement Decision Needed:** Step 3 of Phase 2 is building an "Item Drawer." Should we implement the `ItemForm` directly into a new Drawer/Modal right now so the user can trigger it from anywhere, or would you prefer a dedicated page (`/dashboard/items/new`) for this Step 1?
 
 ## History
 
@@ -36,3 +44,4 @@ Not Started
 - **Profile Page (2026-04-04)**: Standalone /profile route with user info, usage stats, change password form (email users only), delete account dialog with email confirmation, back to dashboard link
 - **Rate Limiting for Auth (2026-04-04)**: Upstash Redis rate limiting on all auth endpoints with fail-open behavior, sliding window algorithm, human-readable retry messages
 - **Item Listing by Type Page (2026-04-05)**: Dynamic `/dashboard/items/[type]` routes with grid/list toggle, empty states, loading skeletons, sidebar navigation links, and persistent layout via route groups
+- **Item Creation Flow (2026-04-07)**: Complete item creation modal with text-based types (snippets, prompts, notes, commands, links), conditional field rendering, tag upserting, and native HTML select dropdown

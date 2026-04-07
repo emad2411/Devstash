@@ -81,3 +81,16 @@ export const deleteAccountSchema = z.object({
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>
 export type ChangePasswordInput = z.infer<typeof changePasswordSchema>
 export type DeleteAccountInput = z.infer<typeof deleteAccountSchema>
+
+// Item creation schema
+export const createItemSchema = z.object({
+  title: z.string().min(1, "Title is required").max(100, "Title must be less than 100 characters"),
+  itemTypeId: z.string().min(1, "Item type is required"),
+  content: z.string().optional(),
+  url: z.string().url("Please enter a valid URL").optional().or(z.literal("")),
+  description: z.string().max(500, "Description must be less than 500 characters").optional(),
+  language: z.string().optional(),
+  tags: z.string().optional(),
+})
+
+export type CreateItemInput = z.infer<typeof createItemSchema>
