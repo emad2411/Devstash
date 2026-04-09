@@ -4,22 +4,25 @@ import { useEffect, useState } from "react"
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog"
-import { createItemAction, getItemTypes, type CreateItemState } from "@/actions/items"
+import { createItemAction, updateItemAction, getItemTypes, type CreateItemState, type UpdateItemState } from "@/actions/items"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import { createItemSchema, type CreateItemInput } from "@/lib/validations"
-import { Loader2, Plus, X } from "lucide-react"
+import { createItemSchema, updateItemSchema, type CreateItemInput, type UpdateItemInput } from "@/lib/validations"
+import { Loader2, Plus, Pencil, X } from "lucide-react"
 import type { ItemType } from "@prisma/client"
+import type { DashboardItem } from "@/types/dashboard"
 import { cn } from "@/lib/utils"
 
 interface ItemFormProps {
   open: boolean
   onOpenChange: (open: boolean) => void
+  editItem?: DashboardItem | null
 }
 
-export function ItemForm({ open, onOpenChange }: ItemFormProps) {
+export function ItemForm({ open, onOpenChange, editItem }: ItemFormProps) {
+  const isEditMode = !!editItem
   const [itemTypes, setItemTypes] = useState<ItemType[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -32,16 +35,29 @@ export function ItemForm({ open, onOpenChange }: ItemFormProps) {
     reset,
     watch,
     formState: { errors },
-  } = useForm<CreateItemInput>({
-    resolver: zodResolver(createItemSchema),
+  } = useForm<CreateItemInput | UpdateItemInput>({
+    resolver: zodResolver(isEditMode ? updateItemSchema : createItemSchema),
     defaultValues: {
-      title: "",
-      itemTypeId: "",
-      content: "",
-      url: "",
-      description: "",
-      language: "",
-      tags: "",
+      ...(isEditMode && editItem
+        ? {
+            id: editItem.id,
+            title: editItem.title,
+            itemTypeId: editItem.itemTypeId,
+            content: editItem.content || "",
+            url: editItem.url || "",
+            description: editItem.description || "",
+            language: editItem.language || "",
+            tags: editItem.tags.map((t) => t.name).join(", "),
+          }
+        : {
+            title: "",
+            itemTypeId: "",
+            content: "",
+            url: "",
+            description: "",
+            language: "",
+            tags: "",
+          }),
     },
   })
 
@@ -66,39 +82,88 @@ export function ItemForm({ open, onOpenChange }: ItemFormProps) {
     }
   }, [itemTypeId, itemTypes])
 
+  // When editItem changes, reset form with new values
   useEffect(() => {
-    if (!open) {
-      reset()
+    if (editItem && open) {
+      reset({
+        id: editItem.id,
+        title: editItem.title,
+        itemTypeId: editItem.itemTypeId,
+        content: editItem.content || "",
+        url: editItem.url || "",
+        description: editItem.description || "",
+        language: editItem.language || "",
+        tags: editItem.tags.map((t) => t.name).join(", "),
+      })
+    } else if (!open) {
+      reset({
+        title: "",
+        itemTypeId: "",
+        content: "",
+        url: "",
+        description: "",
+        language: "",
+        tags: "",
+      })
       setServerError(null)
       setSelectedType(null)
     }
-  }, [open, reset])
+  }, [open, editItem, reset])
 
-  const onSubmit = async (data: CreateItemInput) => {
+  const onSubmit = async (data: CreateItemInput | UpdateItemInput) => {
     setIsSubmitting(true)
     setServerError(null)
 
     const formData = new FormData()
-    formData.append("title", data.title)
-    formData.append("itemTypeId", data.itemTypeId)
-    if (data.content) formData.append("content", data.content)
-    if (data.url) formData.append("url", data.url)
-    if (data.description) formData.append("description", data.description)
-    if (data.language) formData.append("language", data.language)
-    if (data.tags) formData.append("tags", data.tags)
 
-    const result: CreateItemState = await createItemAction({}, formData)
+    if (isEditMode && "id" in data) {
+      // Update mode
+      const updateData = data as UpdateItemInput
+      formData.append("id", updateData.id)
+      formData.append("title", updateData.title)
+      formData.append("itemTypeId", updateData.itemTypeId)
+      if (updateData.content) formData.append("content", updateData.content)
+      if (updateData.url) formData.append("url", updateData.url)
+      if (updateData.description) formData.append("description", updateData.description)
+      if (updateData.language) formData.append("language", updateData.language)
+      if (updateData.tags) formData.append("tags", updateData.tags)
 
-    if (result.error) {
-      setServerError(result.error)
-      setIsSubmitting(false)
-      return
+      const result: UpdateItemState = await updateItemAction({}, formData)
+
+      if (result.error) {
+        setServerError(result.error)
+        setIsSubmitting(false)
+        return
+      }
+
+      if (result.success) {
+        onOpenChange(false)
+      }
+    } else {
+      // Create mode
+      const createData = data as CreateItemInput
+      formData.append("title", createData.title)
+      formData.append("itemTypeId", createData.itemTypeId)
+      if (createData.content) formData.append("content", createData.content)
+      if (createData.url) formData.append("url", createData.url)
+      if (createData.description) formData.append("description", createData.description)
+      if (createData.language) formData.append("language", createData.language)
+      if (createData.tags) formData.append("tags", createData.tags)
+
+      const result: CreateItemState = await createItemAction({}, formData)
+
+      if (result.error) {
+        setServerError(result.error)
+        setIsSubmitting(false)
+        return
+      }
+
+      if (result.success) {
+        onOpenChange(false)
+        reset()
+      }
     }
 
-    if (result.success) {
-      onOpenChange(false)
-      reset()
-    }
     setIsSubmitting(false)
   }
 
@@ -129,10 +194,10 @@ export function ItemForm({ open, onOpenChange }: ItemFormProps) {
             <div className="flex items-center justify-between px-6 py-5 border-b border-border">
               <div>
                 <DialogPrimitive.Title className="text-lg font-semibold text-popover-foreground">
-                  Create New Item
+                  {isEditMode ? "Edit Item" : "Create New Item"}
                 </DialogPrimitive.Title>
                 <DialogPrimitive.Description className="text-sm text-muted-foreground mt-1">
-                  Add a new item to your DevStash collection.
+                  {isEditMode ? "Update your item details." : "Add a new item to your DevStash collection."}
                 </DialogPrimitive.Description>
               </div>
               <DialogPrimitive.Close
@@ -146,7 +211,7 @@ export function ItemForm({ open, onOpenChange }: ItemFormProps) {
 
             {/* Form Content - Scrollable with consistent padding */}
             <form onSubmit={handleSubmit(onSubmit)}>
-              <div className="px-6 py-6 space-y-6 max-h-[calc(100vh-280px)] overflow-y-auto">
+              <div className="px-6 py-6 space-y-6 max-h-[calc(100vh-280px)] overflow-y-auto scrollbar-thin">
                 {/* Item Type */}
                 <div className="space-y-2">
                   <Label htmlFor="itemTypeId">Item Type</Label>
@@ -157,7 +222,7 @@ export function ItemForm({ open, onOpenChange }: ItemFormProps) {
                       <select
                         {...field}
                         id="itemTypeId"
-                        disabled={isLoading}
+                        disabled={isLoading || isEditMode}
                         className={cn(
                           "w-full h-10 px-3 rounded-lg border bg-background text-sm",
                           "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-0",
@@ -376,7 +441,12 @@ export function ItemForm({ open, onOpenChange }: ItemFormProps) {
                   {isSubmitting ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Creating...
+                      {isEditMode ? "Saving..." : "Creating..."}
+                    </>
+                  ) : isEditMode ? (
+                    <>
+                      <Pencil className="mr-2 h-4 w-4" />
+                      Save Changes
                     </>
                   ) : (
                     <>

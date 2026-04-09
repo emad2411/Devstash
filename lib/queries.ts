@@ -137,6 +137,7 @@ export async function getRecentItems(userId: string, limit = 8) {
       isPinned: true,
       language: true,
       itemTypeId: true,
+      createdAt: true,
       updatedAt: true,
       tags: {
         select: {
@@ -169,6 +170,7 @@ export async function getRecentItems(userId: string, limit = 8) {
     isPinned: item.isPinned,
     language: item.language,
     itemTypeId: item.itemTypeId,
+    createdAt: item.createdAt.toISOString(),
     updatedAt: item.updatedAt.toISOString(),
     tags: item.tags.map((t) => ({ name: t.tag.name })),
     itemType: item.itemType,
@@ -357,6 +359,7 @@ export async function getItemsByType(userId: string, typeName: string) {
       isPinned: true,
       language: true,
       itemTypeId: true,
+      createdAt: true,
       updatedAt: true,
       tags: {
         select: {
@@ -388,6 +391,7 @@ export async function getItemsByType(userId: string, typeName: string) {
     isPinned: item.isPinned,
     language: item.language,
     itemTypeId: item.itemTypeId,
+    createdAt: item.createdAt.toISOString(),
     updatedAt: item.updatedAt.toISOString(),
     tags: item.tags.map((t) => ({ name: t.tag.name })),
     itemType: item.itemType,

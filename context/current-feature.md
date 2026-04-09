@@ -1,16 +1,28 @@
-# Current Feature
+# Current Feature — Item Drawer
 
 ## Status
 
-Not Started
+In Progress
 
 ## Goals
 
-<!-- Feature goals go here -->
+- Display a slide-over drawer when clicking an item card
+- Show all item data with type-aware content formatting (code editor look for snippets, terminal style for commands, etc.)
+- Include Edit, Delete, and Favorite action buttons
+- Install shadcn Sheet component for the drawer primitive
+- Add `prism-react-renderer` for syntax highlighting in code snippets
 
 ## Notes
 
-<!-- Additional notes go here -->
+- **Sheet component**: Use shadcn's Sheet (wraps `@base-ui/react/dialog`) — install via `npx shadcn@latest add sheet`
+- **Syntax highlighting**: Use `prism-react-renderer` — lightweight, client-side, great theme support
+- **Edit mode**: Extend existing `ItemForm` to accept optional `item` prop for pre-filling fields
+- **New server actions**: `updateItemAction`, `deleteItemAction`, `toggleFavoriteAction`
+- **New validation**: `updateItemSchema` in `lib/validations.ts`
+- **Type update**: Add `createdAt: string` to `DashboardItem`
+- **Query update**: Include `createdAt` in `getRecentItems()` and `getItemsByType()`
+- **Files to create**: `item-drawer.tsx`, `delete-confirm-dialog.tsx`, `sheet.tsx`
+- **Files to modify**: `item-form.tsx`, `items-grid.tsx`, `item-card.tsx`, `actions/items.ts`, `lib/validations.ts`, `types/dashboard.ts`, `lib/queries.ts`, `package.json`
 
 ## History
 

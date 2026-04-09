@@ -94,3 +94,17 @@ export const createItemSchema = z.object({
 })
 
 export type CreateItemInput = z.infer<typeof createItemSchema>
+
+// Item update schema (same as create but with required id)
+export const updateItemSchema = z.object({
+  id: z.string().min(1, "Item ID is required"),
+  title: z.string().min(1, "Title is required").max(100, "Title must be less than 100 characters"),
+  itemTypeId: z.string().min(1, "Item type is required"),
+  content: z.string().optional(),
+  url: z.string().url("Please enter a valid URL").optional().or(z.literal("")),
+  description: z.string().max(500, "Description must be less than 500 characters").optional(),
+  language: z.string().optional(),
+  tags: z.string().optional(),
+})
+
+export type UpdateItemInput = z.infer<typeof updateItemSchema>

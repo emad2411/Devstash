@@ -9,6 +9,7 @@ export interface DashboardItem {
   isPinned: boolean;
   language: string | null;
   itemTypeId: string;
+  createdAt: string;       // ISO string (serialized for client)
   updatedAt: string;       // ISO string (serialized for client)
   tags: { name: string }[];
   itemType: {

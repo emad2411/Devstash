@@ -8,6 +8,7 @@ import { Pin, Star } from 'lucide-react';
 
 interface ItemCardProps {
   item: DashboardItem;
+  onClick?: (item: DashboardItem) => void;
 }
 
 function formatRelativeTime(dateString: string): string {
@@ -34,7 +35,7 @@ function formatRelativeTime(dateString: string): string {
   }
 }
 
-export function ItemCard({ item }: ItemCardProps) {
+export function ItemCard({ item, onClick }: ItemCardProps) {
   const typeColor = item.itemType.color;
   const typeName = item.itemType.name;
   const relativeTime = useMemo(() => formatRelativeTime(item.updatedAt), [item.updatedAt]);
@@ -43,6 +44,7 @@ export function ItemCard({ item }: ItemCardProps) {
     <div
       className="group relative cursor-pointer overflow-hidden rounded-xl border bg-card p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
       style={{ borderLeftWidth: '4px', borderLeftColor: typeColor }}
+      onClick={() => onClick?.(item)}
     >
       {/* Header row */}
       <div className="mb-3 flex items-start justify-between">
