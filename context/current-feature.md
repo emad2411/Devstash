@@ -1,28 +1,16 @@
-# Current Feature — Item Drawer
+# Current Feature
 
 ## Status
 
-In Progress
+Not Started
 
 ## Goals
 
-- Display a slide-over drawer when clicking an item card
-- Show all item data with type-aware content formatting (code editor look for snippets, terminal style for commands, etc.)
-- Include Edit, Delete, and Favorite action buttons
-- Install shadcn Sheet component for the drawer primitive
-- Add `prism-react-renderer` for syntax highlighting in code snippets
+<!-- List specific goals for this feature -->
 
 ## Notes
 
-- **Sheet component**: Use shadcn's Sheet (wraps `@base-ui/react/dialog`) — install via `npx shadcn@latest add sheet`
-- **Syntax highlighting**: Use `prism-react-renderer` — lightweight, client-side, great theme support
-- **Edit mode**: Extend existing `ItemForm` to accept optional `item` prop for pre-filling fields
-- **New server actions**: `updateItemAction`, `deleteItemAction`, `toggleFavoriteAction`
-- **New validation**: `updateItemSchema` in `lib/validations.ts`
-- **Type update**: Add `createdAt: string` to `DashboardItem`
-- **Query update**: Include `createdAt` in `getRecentItems()` and `getItemsByType()`
-- **Files to create**: `item-drawer.tsx`, `delete-confirm-dialog.tsx`, `sheet.tsx`
-- **Files to modify**: `item-form.tsx`, `items-grid.tsx`, `item-card.tsx`, `actions/items.ts`, `lib/validations.ts`, `types/dashboard.ts`, `lib/queries.ts`, `package.json`
+<!-- Add implementation notes, constraints, decisions -->
 
 ## History
 
@@ -49,3 +37,4 @@ In Progress
 - **Rate Limiting for Auth (2026-04-04)**: Upstash Redis rate limiting on all auth endpoints with fail-open behavior, sliding window algorithm, human-readable retry messages
 - **Item Listing by Type Page (2026-04-05)**: Dynamic `/dashboard/items/[type]` routes with grid/list toggle, empty states, loading skeletons, sidebar navigation links, and persistent layout via route groups
 - **Item Creation Flow (2026-04-07)**: Complete item creation modal with text-based types (snippets, prompts, notes, commands, links), conditional field rendering, tag upserting, and native HTML select dropdown
+- **Item Drawer (2026-04-09)**: Slide-over drawer with type-aware content display (code blocks with syntax highlighting, terminal style for commands, styled prompts/notes/links), Edit/Delete/Favorite actions, modern scrollbar styling
