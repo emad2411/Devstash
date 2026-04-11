@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { createItemSchema, updateItemSchema, type CreateItemInput, type UpdateItemInput } from "@/lib/validations"
 import { Loader2, Plus, Pencil, X } from "lucide-react"
+import { toast } from "sonner"
 import type { ItemType } from "@prisma/client"
 import type { DashboardItem } from "@/types/dashboard"
 import { cn } from "@/lib/utils"
@@ -138,6 +139,7 @@ export function ItemForm({ open, onOpenChange, editItem }: ItemFormProps) {
 
       if (result.success) {
         onOpenChange(false)
+        toast.success("Item updated successfully")
       }
     } else {
       // Create mode
@@ -161,6 +163,7 @@ export function ItemForm({ open, onOpenChange, editItem }: ItemFormProps) {
       if (result.success) {
         onOpenChange(false)
         reset()
+        toast.success("Item created successfully")
       }
     }
 

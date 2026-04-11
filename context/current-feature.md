@@ -1,16 +1,20 @@
-# Current Feature
+# Current Feature: Add Sonner Toast Library
 
 ## Status
 
-Not Started
+In Progress
 
 ## Goals
 
-<!-- List specific goals for this feature -->
+- Install sonner library for toast notifications
+- Create toast provider component
+- Add toasts for item creation
+- Add toasts for item editing
+- Add toasts for item deletion
 
 ## Notes
 
-<!-- Add implementation notes, constraints, decisions -->
+Use sonner (https://sonner.emilkowal.ski) for React toasts
 
 ## History
 

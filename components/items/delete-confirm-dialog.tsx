@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Trash2, Loader2 } from 'lucide-react'
+import { toast } from 'sonner'
 
 interface DeleteConfirmDialogProps {
   item: DashboardItem | null
@@ -40,6 +41,7 @@ export function DeleteConfirmDialog({ item, open, onOpenChange, onSuccess }: Del
       }
       onOpenChange(false)
       onSuccess()
+      toast.success("Item deleted successfully")
     })
   }
 
