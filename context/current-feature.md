@@ -1,20 +1,16 @@
-# Current Feature: Add Sonner Toast Library
+# Current Feature
 
 ## Status
 
-In Progress
+Not Started
 
 ## Goals
 
-- Install sonner library for toast notifications
-- Create toast provider component
-- Add toasts for item creation
-- Add toasts for item editing
-- Add toasts for item deletion
+<!-- List specific goals for this feature -->
 
 ## Notes
 
-Use sonner (https://sonner.emilkowal.ski) for React toasts
+<!-- Add implementation notes, constraints, decisions -->
 
 ## History
 
@@ -42,3 +38,4 @@ Use sonner (https://sonner.emilkowal.ski) for React toasts
 - **Item Listing by Type Page (2026-04-05)**: Dynamic `/dashboard/items/[type]` routes with grid/list toggle, empty states, loading skeletons, sidebar navigation links, and persistent layout via route groups
 - **Item Creation Flow (2026-04-07)**: Complete item creation modal with text-based types (snippets, prompts, notes, commands, links), conditional field rendering, tag upserting, and native HTML select dropdown
 - **Item Drawer (2026-04-09)**: Slide-over drawer with type-aware content display (code blocks with syntax highlighting, terminal style for commands, styled prompts/notes/links), Edit/Delete/Favorite actions, modern scrollbar styling
+- **Sonner Toast Notifications (2026-04-11)**: Added Sonner toast library for item create, edit, and delete notifications
